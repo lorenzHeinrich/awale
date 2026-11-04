@@ -20,4 +20,12 @@ exe = executable(
   install : true,
 )
 
-test('basic', exe)
+inc = include_directories('src')
+
+board_test = executable(
+  'board-test',
+  ['tests/board_test.c', 'src/board.c'],
+  include_directories: inc,
+)
+
+test('test', board_test)
