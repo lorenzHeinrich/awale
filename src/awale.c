@@ -1,4 +1,6 @@
 #include "src/board.h"
+#include <errno.h>
+#include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -63,6 +65,9 @@ MoveCheck move(Game *game, int pit) {
     return GAME_OVER;
   }
   Player *player = player_from_turn(game);
+  if (!check_pit(pit)) {
+    return PIT_INDEX_ERROR;
+  }
   SowResult sow_res = sow(&game->board, player->side, pit);
   if (!sow_res.move_check) {
     return sow_res.move_check;
@@ -118,14 +123,15 @@ int promt_move(Player *player) {
   while (true) {
     char *resp = readline(prompt);
 
+    errno = 0;
     char *end;
     move = strtol(resp, &end, 10);
-    if (*end != '\0') {
+    if (end == resp || *end != '\0') {
       printf("Invalid number input\n");
       continue;
     }
-    if (!check_pit(move)) {
-      printf("Invalid pit index");
+    if (errno == ERANGE || move < INT_MIN || move > INT_MAX) {
+      printf("Number out of int range\n");
       continue;
     }
     return (int)move;

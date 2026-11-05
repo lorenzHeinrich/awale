@@ -34,9 +34,6 @@ bool check_take_stones(Board *board, Side side, int pit) {
   if (!is_side(side, pit)) {
     return NOT_SIDES_PIT;
   }
-  if (pit >= N_PITS) {
-    return PIT_INDEX_ERROR;
-  }
   if (board->pits[pit] == 0) {
     return PIT_EMPTY;
   }
