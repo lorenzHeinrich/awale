@@ -4,11 +4,9 @@
 
 #include <stdbool.h>
 #define PITS_PER_SIDE 6
+#define START_STONES_PER_PIT 4
 #define N_PITS (2 * PITS_PER_SIDE)
 #define N_STONES (START_STONES_PER_PIT * N_PITS)
-#define TWO_OR_THREE(x) ((x) == 2 || (x) == 3)
-#define NEXT_PIT(pit) (((pit) + 1) % N_PITS)
-#define PREV_PIT(pit) ((((pit) + N_PITS) - 1) % N_PITS)
 
 typedef struct Board {
   int pits[2 * PITS_PER_SIDE];
@@ -16,7 +14,7 @@ typedef struct Board {
 
 typedef enum { A = 0, B = 6 } Side;
 
-Board board(int start_stones);
+Board board(void);
 
 bool check_pit(long pit);
 bool is_side(Side side, int pit);

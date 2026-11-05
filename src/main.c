@@ -1,6 +1,5 @@
 
 #include "src/awale/awale.h"
-#include "src/awale/moves.h"
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>

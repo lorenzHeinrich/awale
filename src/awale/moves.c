@@ -2,6 +2,9 @@
 #include "src/awale/board.h"
 #include <stddef.h>
 
+#define TWO_OR_THREE(x) ((x) == 2 || (x) == 3)
+#define PREV_PIT(pit) ((((pit) + N_PITS) - 1) % N_PITS)
+
 static int _sow(Board *board, int start_pit);
 static MoveCheck _check_catch(Board *board, int pit, Side side);
 static int _catch(Board *board, int pit, Side side);

@@ -69,7 +69,7 @@ Game new_game(char *name_a, char *name_b) {
   Player player_b = (Player){name_b, B, 0};
   Side turn = (rand() % 2 == 0) ? A : B;
 
-  return (Game){.board = board(START_STONES_PER_PIT),
+  return (Game){.board = board(),
                 .player_a = player_a,
                 .player_b = player_b,
                 .turn = turn,

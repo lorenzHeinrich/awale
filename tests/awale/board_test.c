@@ -4,13 +4,9 @@
 #include <stddef.h>
 
 static void test_board(void) {
-  int starting_stones[] = {0, 1, 4};
-  for (size_t i = 0; i < sizeof starting_stones / sizeof starting_stones[0];
-       i++) {
-    Board b = board(starting_stones[i]);
-    for (int pit = 0; pit < N_PITS; pit++) {
-      assert(b.pits[pit] == starting_stones[i]);
-    }
+  Board b = board();
+  for (int pit = 0; pit < N_PITS; pit++) {
+    assert(b.pits[pit] == START_STONES_PER_PIT);
   }
 }
 
@@ -41,7 +37,7 @@ static void test_is_side(void) {
 }
 
 static void test_sides_is_empty(void) {
-  Board b = board(0);
+  Board b = {0};
   assert(sides_is_empty(&b, A));
   assert(sides_is_empty(&b, B));
 
@@ -54,7 +50,7 @@ static void test_sides_is_empty(void) {
     b.pits[pit] = 0;
   }
 
-  b = board(4);
+  b = board();
   assert(!sides_is_empty(&b, A));
   assert(!sides_is_empty(&b, B));
 }
@@ -66,22 +62,25 @@ static void test_other_side(void) {
 
 static void test_take_stones(void) {
   for (int pit = 0; pit < N_PITS; pit++) {
-    Board b = board(4);
-    assert(take_stones(&b, pit) == 4);
+    Board b = board();
+    assert(take_stones(&b, pit) == START_STONES_PER_PIT);
     assert(b.pits[pit] == 0);
     assert(take_stones(&b, pit) == 0);
     for (int other = 0; other < N_PITS; other++) {
-      assert(b.pits[other] == (other == pit ? 0 : 4));
+      assert(b.pits[other] == (other == pit ? 0 : START_STONES_PER_PIT));
     }
   }
 }
 
 static void test_put_stone(void) {
-  int starting_stones[] = {0, 4};
+  int starting_stones[] = {0, START_STONES_PER_PIT};
   for (size_t i = 0; i < sizeof starting_stones / sizeof starting_stones[0];
        i++) {
     for (int pit = 0; pit < N_PITS; pit++) {
-      Board b = board(starting_stones[i]);
+      Board b = {0};
+      for (int other = 0; other < N_PITS; other++) {
+        b.pits[other] = starting_stones[i];
+      }
       put_stone(&b, pit);
       assert(b.pits[pit] == starting_stones[i] + 1);
       put_stone(&b, pit);

@@ -5,7 +5,6 @@
 #include "src/awale/board.h"
 #include "src/awale/moves.h"
 
-#define START_STONES_PER_PIT 4
 #define PLAYER_NAME_MAX_LENGTH 31
 
 typedef struct Player {

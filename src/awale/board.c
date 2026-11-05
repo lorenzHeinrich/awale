@@ -4,10 +4,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
-Board board(int start_stones) {
+Board board(void) {
   Board board = {0};
   for (int i = 0; i < N_PITS; i++) {
-    board.pits[i] = start_stones;
+    board.pits[i] = START_STONES_PER_PIT;
   }
   return board;
 }

@@ -8,7 +8,7 @@ static void test_move(void) { /* TODO: add assertions. */ }
 static void test_move_grand_slam(void) {
   for (int side = A; side <= B; side += PITS_PER_SIDE) {
     Game game = new_game("Alice", "Bob");
-    game.board = board(0);
+    game.board = (Board){0};
     game.turn = side;
     game.player_a.stone_bag = 21;
     game.player_b.stone_bag = 21;

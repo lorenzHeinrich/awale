@@ -10,7 +10,7 @@ static void assert_unchanged(Board *actual, Board *before) {
 }
 
 static void test_sow_and_catch(void) {
-  Board b = board(4);
+  Board b = board();
 
   MoveResult result = sow_and_catch(&b, A, 0);
 
@@ -24,7 +24,7 @@ static void test_sow_and_catch(void) {
 }
 
 static void test_check_sow_ownership_and_stones(void) {
-  Board b = board(4);
+  Board b = board();
   Board before = b;
   assert(check_sow(&b, A, 0));
   assert(check_sow(&b, A, PITS_PER_SIDE - 1));
