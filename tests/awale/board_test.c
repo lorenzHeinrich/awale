@@ -92,8 +92,6 @@ static void test_put_stone(void) {
   }
 }
 
-static void test_print_board(void) { /* TODO: add assertions. */ }
-
 int main(void) {
   test_board();
   test_check_pit();
@@ -102,6 +100,5 @@ int main(void) {
   test_other_side();
   test_take_stones();
   test_put_stone();
-  test_print_board();
   return 0;
 }
