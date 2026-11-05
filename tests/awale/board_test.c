@@ -4,9 +4,13 @@
 #include <stddef.h>
 
 static void test_board(void) {
-  Board b = board(4);
-  for (size_t i = 0; i < N_PITS; i++) {
-    assert(b.pits[i] == 4);
+  int starting_stones[] = {0, 1, 4};
+  for (size_t i = 0; i < sizeof starting_stones / sizeof starting_stones[0];
+       i++) {
+    Board b = board(starting_stones[i]);
+    for (int pit = 0; pit < N_PITS; pit++) {
+      assert(b.pits[pit] == starting_stones[i]);
+    }
   }
 }
 
@@ -21,15 +25,73 @@ static void test_check_pit(void) {
   assert(!check_pit(LONG_MAX));
 }
 
-static void test_is_side(void) { /* TODO: add assertions. */ }
+static void test_is_side(void) {
+  for (int pit = 0; pit < N_PITS; pit++) {
+    assert(is_side(A, pit) == (pit < PITS_PER_SIDE));
+    assert(is_side(B, pit) == (pit >= PITS_PER_SIDE));
+  }
+  assert(!is_side(A, -1));
+  assert(!is_side(B, -1));
+  assert(!is_side(A, N_PITS));
+  assert(!is_side(B, N_PITS));
+  assert(!is_side(A, INT_MIN));
+  assert(!is_side(B, INT_MIN));
+  assert(!is_side(A, INT_MAX));
+  assert(!is_side(B, INT_MAX));
+}
 
-static void test_sides_is_empty(void) { /* TODO: add assertions. */ }
+static void test_sides_is_empty(void) {
+  Board b = board(0);
+  assert(sides_is_empty(&b, A));
+  assert(sides_is_empty(&b, B));
 
-static void test_other_side(void) { /* TODO: add assertions. */ }
+  /* A single occupied pit anywhere makes only its own side nonempty. */
+  for (int pit = 0; pit < N_PITS; pit++) {
+    b.pits[pit] = 1;
+    assert(sides_is_empty(&b, A) == (pit >= PITS_PER_SIDE));
+    assert(sides_is_empty(&b, B) == (pit < PITS_PER_SIDE));
+    assert(b.pits[pit] == 1);
+    b.pits[pit] = 0;
+  }
 
-static void test_take_stones(void) { /* TODO: add assertions. */ }
+  b = board(4);
+  assert(!sides_is_empty(&b, A));
+  assert(!sides_is_empty(&b, B));
+}
 
-static void test_put_stone(void) { /* TODO: add assertions. */ }
+static void test_other_side(void) {
+  assert(other_side(A) == B);
+  assert(other_side(B) == A);
+}
+
+static void test_take_stones(void) {
+  for (int pit = 0; pit < N_PITS; pit++) {
+    Board b = board(4);
+    assert(take_stones(&b, pit) == 4);
+    assert(b.pits[pit] == 0);
+    assert(take_stones(&b, pit) == 0);
+    for (int other = 0; other < N_PITS; other++) {
+      assert(b.pits[other] == (other == pit ? 0 : 4));
+    }
+  }
+}
+
+static void test_put_stone(void) {
+  int starting_stones[] = {0, 4};
+  for (size_t i = 0; i < sizeof starting_stones / sizeof starting_stones[0];
+       i++) {
+    for (int pit = 0; pit < N_PITS; pit++) {
+      Board b = board(starting_stones[i]);
+      put_stone(&b, pit);
+      assert(b.pits[pit] == starting_stones[i] + 1);
+      put_stone(&b, pit);
+      for (int other = 0; other < N_PITS; other++) {
+        int expected = starting_stones[i] + (other == pit ? 2 : 0);
+        assert(b.pits[other] == expected);
+      }
+    }
+  }
+}
 
 static void test_print_board(void) { /* TODO: add assertions. */ }
 
