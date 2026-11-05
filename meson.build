@@ -7,10 +7,12 @@ project(
 )
 
 dependencies = [
+  dependency('readline'),
 ]
 
 sources = [
   'src/awale.c',
+  'src/board.c',
 ]
 
 exe = executable(

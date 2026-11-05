@@ -2,11 +2,31 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+
+Board board(void) {
+  Board board = {0};
+  for (int i = 0; i < N_PITS; i++) {
+    board.pits[i] = START_STONES_PER_PIT;
+  }
+  return board;
+}
 
 bool is_side(Side side, int pit) {
   int first_pit = (int)side;
   return pit >= first_pit && pit < first_pit + PITS_PER_SIDE;
 }
+
+bool sides_is_empty(Board *baord, Side side) {
+  for (size_t i = side; i < side + PITS_PER_SIDE; i++) {
+    if (baord->pits[i] > 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool check_pit(long pit) { return pit >= 0 && pit < N_PITS; }
 
 Side other_side(Side side) { return side == A ? B : A; }
 
@@ -36,15 +56,7 @@ static TakeStonesResult take_stones(Board *board, Side side, int pit) {
 static void put_stone(Board *board, int pit) { board->pits[pit]++; }
 
 MoveCheck check_sow(Board *board, Side side, int start_pit) {
-  bool other_side_empty = true;
-  size_t other = other_side(side);
-  for (size_t i = other; i < other + PITS_PER_SIDE; i++) {
-    if (board->pits[i] > 0) {
-      other_side_empty = false;
-      break;
-    }
-  }
-  if (!other_side_empty) {
+  if (!sides_is_empty(board, other_side(side))) {
     return MOVE_OK;
   }
   int distance = side + PITS_PER_SIDE - start_pit;
@@ -63,17 +75,23 @@ SowResult sow(Board *board, Side side, int start_pit) {
     }
   }
   return (SowResult){.move_check = take_results.move_check,
-                     .last_pit = start_pit + take_results.stones};
+                     .last_pit = (start_pit + take_results.stones) % N_PITS};
 }
 
 MoveCheck check_catch(Board *board, int pit, Side side) {
-  int check_pit = pit;
-  bool is_grand_slam = false;
-  while (is_side(side, check_pit)) {
-    is_grand_slam |= TWO_OR_THREE(board->pits[check_pit]);
-    check_pit = PREV_PIT(check_pit);
+  int total_stones = 0;
+  for (size_t i = side; i < side + PITS_PER_SIDE; i++) {
+    total_stones += board->pits[i];
   }
-  return is_grand_slam ? GRAND_SLAM : MOVE_OK;
+  int would_capture = 0;
+  for (int i = pit; is_side(side, i); i--) {
+    if (!TWO_OR_THREE(board->pits[i])) {
+      break;
+    }
+    would_capture += board->pits[i];
+  }
+  return would_capture > 0 && total_stones == would_capture ? GRAND_SLAM
+                                                            : MOVE_OK;
 }
 
 static int catch_recursive(Board *board, int pit, Side side) {
@@ -88,4 +106,33 @@ CatchResult catch(Board *board, int pit, Side side) {
   MoveCheck move_check = check_catch(board, pit, side);
   int harvest = move_check ? catch_recursive(board, pit, side) : 0;
   return (CatchResult){move_check, harvest};
+}
+
+static void print_side(Board *board, Side side) {
+  printf("|");
+  for (size_t i = 0; i < PITS_PER_SIDE; i++) {
+    printf(" %2d |", board->pits[side == A ? i : N_PITS - i - 1]);
+  }
+}
+
+void print_board(Board *board) {
+  printf("   +");
+  for (int i = 0; i < PITS_PER_SIDE; i++) {
+    printf("----+");
+  }
+  printf("\nB: ");
+  print_side(board, B);
+  printf("\n");
+  printf("   +");
+  for (int i = 0; i < PITS_PER_SIDE; i++) {
+    printf("----+");
+  }
+  printf("\nA: ");
+  print_side(board, A);
+  printf("\n");
+  printf("   +");
+  for (int i = 0; i < PITS_PER_SIDE; i++) {
+    printf("----+");
+  }
+  printf("\n");
 }

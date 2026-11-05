@@ -24,6 +24,8 @@ typedef enum {
   NOT_SIDES_PIT = false,
   NOT_A_FEED = false,
   GRAND_SLAM = false,
+  NOT_YOUR_TURN = false,
+  GAME_OVER = false,
 } MoveCheck;
 
 typedef struct {
@@ -41,8 +43,20 @@ typedef struct {
   int harvest;
 } CatchResult;
 
+Board board(void);
+
+MoveCheck check_sow(Board *board, Side side, int start_pit);
+
+bool check_pit(long pit);
+
+bool side_is_empty(Board *board, Side side);
+
+Side other_side(Side side);
+
 SowResult sow(Board *board, Side side, int start_pit);
 
 CatchResult catch (Board *board, int pit, Side side);
+
+void print_board(Board *board);
 
 #endif // !BOARD_H
