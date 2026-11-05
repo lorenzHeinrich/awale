@@ -49,8 +49,6 @@ MoveCheck check_sow(Board *board, Side side, int start_pit);
 
 bool check_pit(long pit);
 
-bool check_take_stones(Board *board, Side side, int pit);
-
 MoveCheck check_catch(Board *board, int pit, Side side);
 
 bool side_is_empty(Board *board, Side side);

@@ -30,29 +30,21 @@ bool check_pit(long pit) { return pit >= 0 && pit < N_PITS; }
 
 Side other_side(Side side) { return side == A ? B : A; }
 
-bool check_take_stones(Board *board, Side side, int pit) {
-  if (!is_side(side, pit)) {
-    return NOT_SIDES_PIT;
-  }
-  if (board->pits[pit] == 0) {
-    return PIT_EMPTY;
-  }
-  return MOVE_OK;
-}
-
-static TakeStonesResult take_stones(Board *board, Side side, int pit) {
-  MoveCheck move_check = check_take_stones(board, side, pit);
-  int stones = 0;
-  if (move_check) {
-    stones = board->pits[pit];
-    board->pits[pit] = 0;
-  }
-  return (TakeStonesResult){.move_check = move_check, .stones = stones};
+static int take_stones(Board *board, int pit) {
+  int stones = board->pits[pit];
+  board->pits[pit] = 0;
+  return stones;
 }
 
 static void put_stone(Board *board, int pit) { board->pits[pit]++; }
 
 MoveCheck check_sow(Board *board, Side side, int start_pit) {
+  if (!is_side(side, start_pit)) {
+    return NOT_SIDES_PIT;
+  }
+  if (board->pits[start_pit] == 0) {
+    return PIT_EMPTY;
+  }
   if (!sides_is_empty(board, other_side(side))) {
     return MOVE_OK;
   }
@@ -65,14 +57,12 @@ SowResult sow(Board *board, Side side, int start_pit) {
   if (!move_check) {
     return (SowResult){move_check, 0};
   }
-  TakeStonesResult take_results = take_stones(board, side, start_pit);
-  if (take_results.move_check) {
-    for (int i = 1; i <= take_results.stones; i++) {
-      put_stone(board, (start_pit + i) % N_PITS);
-    }
+  int stones = take_stones(board, start_pit);
+  for (int i = 1; i <= stones; i++) {
+    put_stone(board, (start_pit + i) % N_PITS);
   }
-  return (SowResult){.move_check = take_results.move_check,
-                     .last_pit = (start_pit + take_results.stones) % N_PITS};
+  return (SowResult){.move_check = move_check,
+                     .last_pit = (start_pit + stones) % N_PITS};
 }
 
 MoveCheck check_catch(Board *board, int pit, Side side) {
@@ -95,8 +85,7 @@ static int catch_recursive(Board *board, int pit, Side side) {
   if (!TWO_OR_THREE(board->pits[pit]) || !is_side(side, pit)) {
     return 0;
   }
-  return take_stones(board, side, pit).stones +
-         catch_recursive(board, PREV_PIT(pit), side);
+  return take_stones(board, pit) + catch_recursive(board, PREV_PIT(pit), side);
 }
 
 CatchResult catch(Board *board, int pit, Side side) {
