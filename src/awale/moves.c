@@ -16,7 +16,7 @@ MoveResult sow_and_catch(Board *board, Side side, int start_pit) {
   if (!catch_check) {
     return (MoveResult){catch_check, 0};
   }
-  int obtained = _catch(board, start_pit, side);
+  int obtained = _catch(board, last_pit, other);
   return (MoveResult){MOVE_OK, obtained};
 }
 
