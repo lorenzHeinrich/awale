@@ -18,7 +18,8 @@ MoveResult sow_and_catch(Board *board, Side side, int start_pit) {
   Side other = other_side(side);
   MoveCheck catch_check = _check_catch(board, last_pit, other);
   if (!catch_check) {
-    return (MoveResult){catch_check, 0};
+    /* A grand slam cancels capture, but sowing completes the turn. */
+    return (MoveResult){MOVE_OK, 0};
   }
   int obtained = _catch(board, last_pit, other);
   return (MoveResult){MOVE_OK, obtained};
