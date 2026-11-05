@@ -1,0 +1,83 @@
+#include "src/awale/awale.h"
+#include "src/awale/moves.h"
+#include <limits.h>
+#include <stdio.h>
+#include <string.h>
+
+// clang-format off
+#include <stdlib.h>
+#include <time.h>
+// clang-format on
+
+static Player *next_turn(Game *game) {
+  return game->turn == &game->player_a ? &game->player_b : &game->player_a;
+}
+
+bool can_move(Game *game, Player *player) {
+  for (size_t i = player->side; i < player->side + PITS_PER_SIDE; i++) {
+    if (check_sow(&game->board, player->side, i)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool check_stone_bag(Player player) { return player.stone_bag > N_STONES / 2; }
+
+bool check_end(Game *game) {
+  return !can_move(game, game->turn) || check_stone_bag(game->player_a) ||
+         check_stone_bag(game->player_b);
+}
+
+Player *winner(Game *game) {
+  bool player_a =
+      check_stone_bag(game->player_a) || !can_move(game, &game->player_b);
+  bool player_b =
+      check_stone_bag(game->player_b) || !can_move(game, &game->player_a);
+  if (player_a && !player_b) {
+    return &game->player_a;
+  }
+  if (!player_a && player_b) {
+    return &game->player_b;
+  }
+  return NULL;
+}
+
+MoveResult move(Game *game, int pit) {
+  if (game->game_over) {
+    return (MoveResult){GAME_OVER, 0};
+  };
+  Player *player = game->turn;
+  MoveResult move_result = sow_and_catch(&game->board, player->side, pit);
+  if (move_result.move_check) {
+    player->stone_bag += move_result.obtained;
+    game->turn = next_turn(game);
+    game->game_over = check_end(game);
+    game->winner = winner(game);
+  }
+  return move_result;
+}
+
+Game new_game(char *name_a, char *name_b) {
+  Player player_a = (Player){name_a, A, 0};
+  Player player_b = (Player){name_b, B, 0};
+  Player *turn = (rand() % 2 == 0) ? &player_a : &player_b;
+
+  return (Game){.board = board(START_STONES_PER_PIT),
+                .player_a = player_a,
+                .player_b = player_b,
+                .turn = turn,
+                .winner = NULL,
+                .game_over = false};
+}
+void print_player(Player *player) {
+  char side_string = player->side == A ? 'A' : 'B';
+  printf("Side %c, Player %s - [ %2d ]\n", side_string, player->name,
+         player->stone_bag);
+}
+
+void print_game(Game *game) {
+  print_board(&game->board);
+  print_player(&game->player_a);
+  print_player(&game->player_b);
+}

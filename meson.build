@@ -10,10 +10,13 @@ dependencies = [
   dependency('readline'),
 ]
 
-sources = [
-  'src/awale.c',
-  'src/board.c',
-]
+sources = files(
+  'src/awale/awale.c',
+  'src/awale/board.c',
+  'src/awale/moves.c',
+  'src/main.c',
+)
+
 
 exe = executable(
   'awale',
@@ -26,7 +29,7 @@ inc = include_directories('src')
 
 board_test = executable(
   'board-test',
-  ['tests/board_test.c', 'src/board.c'],
+  ['tests/awale/board_test.c', 'src/awale/board.c'],
   include_directories: inc,
 )
 
