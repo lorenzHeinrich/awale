@@ -1,6 +1,8 @@
 #include "src/awale/awale.h"
+#include "src/awale/board.h"
 #include "src/awale/moves.h"
 #include <limits.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -31,18 +33,32 @@ static bool check_end(Game *game) {
          check_stone_bag(game->player_a) || check_stone_bag(game->player_b);
 }
 
+static Player *winning_player(Game *game) {
+  return check_stone_bag(game->player_a)   ? &game->player_a
+         : check_stone_bag(game->player_b) ? &game->player_b
+                                           : NULL;
+}
+
+static void collect_stones(Game *game, Player *player) {
+  for (size_t i = player->side; i < player->side + PITS_PER_SIDE; i++) {
+    player->stone_bag += take_stones(&game->board, i);
+  }
+}
+
 static Player *winner(Game *game) {
-  bool player_a =
-      check_stone_bag(game->player_a) || !can_move(game, &game->player_b);
-  bool player_b =
-      check_stone_bag(game->player_b) || !can_move(game, &game->player_a);
-  if (player_a && !player_b) {
-    return &game->player_a;
+  if (can_move(game, player_for_side(game, game->turn))) {
+    // both players can move,
+    // check if either on them owns more then half of the stones
+    return winning_player(game);
   }
-  if (!player_a && player_b) {
-    return &game->player_b;
-  }
-  return NULL;
+
+  collect_stones(game, &game->player_a);
+  collect_stones(game, &game->player_b);
+
+  // at least one player can't move
+  // -> collect all stones from the board
+
+  return winning_player(game);
 }
 
 MoveResult move(Game *game, int pit) {

@@ -83,6 +83,7 @@ foreach case_name : [
   'winning_score',
   'no_feed_winner',
   'no_feed_draw',
+  'empty_side_can_be_fed',
 ]
   test('awale/' + case_name, awale_test, args : [case_name])
 endforeach

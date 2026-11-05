@@ -234,6 +234,43 @@ static void test_no_feed_draw(void) {
   }
 }
 
+static void test_empty_side_can_be_fed(void) {
+  Game game = new_game("Alice", "Bob");
+  game.turn = A;
+  game.board = (Board){0};
+  game.board.pits[5] = 1;
+  game.board.pits[11] = 6;
+  game.player_a.stone_bag = 20;
+  game.player_b.stone_bag = 21;
+
+  /* A empties their side, but B can still feed it from pit 11. */
+  MoveResult result = move(&game, 5);
+  assert(result.move_check == MOVE_OK);
+  assert(result.obtained == 0);
+  assert(game.turn == B);
+  assert(!game.game_over);
+  assert(!game.has_winner);
+  assert(game.player_a.stone_bag == 20);
+  assert(game.player_b.stone_bag == 21);
+  for (int pit = 0; pit < N_PITS; pit++) {
+    int expected = pit == 6 ? 1 : (pit == 11 ? 6 : 0);
+    assert(game.board.pits[pit] == expected);
+  }
+
+  /* B feeds A, allowing normal play to continue. */
+  result = move(&game, 11);
+  assert(result.move_check == MOVE_OK);
+  assert(result.obtained == 0);
+  assert(game.turn == A);
+  assert(!game.game_over);
+  assert(!game.has_winner);
+  assert(game.player_a.stone_bag == 20);
+  assert(game.player_b.stone_bag == 21);
+  for (int pit = 0; pit < N_PITS; pit++) {
+    assert(game.board.pits[pit] == (pit <= 6 ? 1 : 0));
+  }
+}
+
 /* An optional case name lets Meson report failures independently. */
 int main(int argc, char **argv) {
   if (argc == 1 || strcmp(argv[1], "player_for_side") == 0) {
@@ -292,6 +329,12 @@ int main(int argc, char **argv) {
   }
   if (argc == 1 || strcmp(argv[1], "no_feed_draw") == 0) {
     test_no_feed_draw();
+    if (argc > 1) {
+      return 0;
+    }
+  }
+  if (argc == 1 || strcmp(argv[1], "empty_side_can_be_fed") == 0) {
+    test_empty_side_can_be_fed();
     if (argc > 1) {
       return 0;
     }

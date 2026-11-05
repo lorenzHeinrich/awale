@@ -47,13 +47,16 @@ MoveCheck check_sow(Board *board, Side side, int start_pit) {
 
 static int _sow(Board *board, int start_pit) {
   int stones = take_stones(board, start_pit);
+  int skip = 0;
   for (int i = 1; i <= stones; i++) {
-    int pit_idx = (start_pit + i) % N_PITS;
-    if (pit_idx != start_pit) {
-      put_stone(board, (start_pit + i) % N_PITS);
+    int pit_idx = (start_pit + i + skip) % N_PITS;
+    if (pit_idx == start_pit) {
+      skip++;
+      pit_idx = (pit_idx + 1) % N_PITS;
     }
+    put_stone(board, pit_idx);
   }
-  return (start_pit + stones) % N_PITS;
+  return (start_pit + stones + skip) % N_PITS;
 }
 
 static MoveCheck _check_catch(Board *board, int pit, Side side) {
