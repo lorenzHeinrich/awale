@@ -9,8 +9,8 @@
 #include <time.h>
 // clang-format on
 
-static Player *next_turn(Game *game) {
-  return game->turn == &game->player_a ? &game->player_b : &game->player_a;
+Player *player_for_side(Game *game, Side side) {
+  return side == A ? &game->player_a : &game->player_b;
 }
 
 bool can_move(Game *game, Player *player) {
@@ -25,8 +25,8 @@ bool can_move(Game *game, Player *player) {
 bool check_stone_bag(Player player) { return player.stone_bag > N_STONES / 2; }
 
 bool check_end(Game *game) {
-  return !can_move(game, game->turn) || check_stone_bag(game->player_a) ||
-         check_stone_bag(game->player_b);
+  return !can_move(game, player_for_side(game, game->turn)) ||
+         check_stone_bag(game->player_a) || check_stone_bag(game->player_b);
 }
 
 Player *winner(Game *game) {
@@ -47,13 +47,17 @@ MoveResult move(Game *game, int pit) {
   if (game->game_over) {
     return (MoveResult){GAME_OVER, 0};
   };
-  Player *player = game->turn;
+  Player *player = player_for_side(game, game->turn);
   MoveResult move_result = sow_and_catch(&game->board, player->side, pit);
   if (move_result.move_check) {
     player->stone_bag += move_result.obtained;
-    game->turn = next_turn(game);
+    game->turn = other_side(game->turn);
     game->game_over = check_end(game);
-    game->winner = winner(game);
+    Player *winning_player = winner(game);
+    game->has_winner = winning_player != NULL;
+    if (game->has_winner) {
+      game->winner = winning_player->side;
+    }
   }
   return move_result;
 }
@@ -61,13 +65,14 @@ MoveResult move(Game *game, int pit) {
 Game new_game(char *name_a, char *name_b) {
   Player player_a = (Player){name_a, A, 0};
   Player player_b = (Player){name_b, B, 0};
-  Player *turn = (rand() % 2 == 0) ? &player_a : &player_b;
+  Side turn = (rand() % 2 == 0) ? A : B;
 
   return (Game){.board = board(START_STONES_PER_PIT),
                 .player_a = player_a,
                 .player_b = player_b,
                 .turn = turn,
-                .winner = NULL,
+                .winner = A,
+                .has_winner = false,
                 .game_over = false};
 }
 void print_player(Player *player) {

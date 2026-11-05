@@ -62,7 +62,7 @@ int main(void) {
   while (!game.game_over) {
     print_game(&game);
     while (true) {
-      int pit = promt_move(game.turn);
+      int pit = promt_move(player_for_side(&game, game.turn));
       MoveResult move_res = move(&game, pit);
       if (move_res.move_check) {
         printf("Move Success\n");
@@ -72,8 +72,8 @@ int main(void) {
     }
   }
   printf("End of Game!! - ");
-  if (game.winner) {
-    printf("winner: %s\n", game.winner->name);
+  if (game.has_winner) {
+    printf("winner: %s\n", player_for_side(&game, game.winner)->name);
   } else {
     printf("draw");
   }

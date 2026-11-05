@@ -18,10 +18,13 @@ typedef struct Game {
   Board board;
   Player player_a;
   Player player_b;
-  Player *turn;
-  Player *winner;
+  Side turn;
+  Side winner;
+  bool has_winner;
   bool game_over;
 } Game;
+
+Player *player_for_side(Game *game, Side side);
 
 MoveResult move(Game *game, int pit);
 Game new_game(char *name_a, char *name_b);
