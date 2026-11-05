@@ -25,10 +25,4 @@ MoveResult sow_and_catch(Board *board, Side side, int start_pit);
 
 MoveCheck check_sow(Board *board, Side side, int start_pit);
 
-MoveCheck _check_catch(Board *board, int pit, Side side);
-
-int _sow(Board *board, int start_pit);
-
-int _catch(Board *board, int pit, Side side);
-
 #endif // !MOVES_H

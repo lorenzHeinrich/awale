@@ -13,7 +13,7 @@ Player *player_for_side(Game *game, Side side) {
   return side == A ? &game->player_a : &game->player_b;
 }
 
-bool can_move(Game *game, Player *player) {
+static bool can_move(Game *game, Player *player) {
   for (size_t i = player->side; i < player->side + PITS_PER_SIDE; i++) {
     if (check_sow(&game->board, player->side, i)) {
       return true;
@@ -22,14 +22,16 @@ bool can_move(Game *game, Player *player) {
   return false;
 }
 
-bool check_stone_bag(Player player) { return player.stone_bag > N_STONES / 2; }
+static bool check_stone_bag(Player player) {
+  return player.stone_bag > N_STONES / 2;
+}
 
-bool check_end(Game *game) {
+static bool check_end(Game *game) {
   return !can_move(game, player_for_side(game, game->turn)) ||
          check_stone_bag(game->player_a) || check_stone_bag(game->player_b);
 }
 
-Player *winner(Game *game) {
+static Player *winner(Game *game) {
   bool player_a =
       check_stone_bag(game->player_a) || !can_move(game, &game->player_b);
   bool player_b =

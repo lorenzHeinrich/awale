@@ -2,6 +2,10 @@
 #include "src/awale/board.h"
 #include <stddef.h>
 
+static int _sow(Board *board, int start_pit);
+static MoveCheck _check_catch(Board *board, int pit, Side side);
+static int _catch(Board *board, int pit, Side side);
+
 MoveResult sow_and_catch(Board *board, Side side, int start_pit) {
   MoveCheck sow_check = check_sow(board, side, start_pit);
   if (!sow_check) {
@@ -37,7 +41,7 @@ MoveCheck check_sow(Board *board, Side side, int start_pit) {
   return board->pits[start_pit] < distance ? NOT_A_FEED : MOVE_OK;
 }
 
-int _sow(Board *board, int start_pit) {
+static int _sow(Board *board, int start_pit) {
   int stones = take_stones(board, start_pit);
   for (int i = 1; i <= stones; i++) {
     put_stone(board, (start_pit + i) % N_PITS);
@@ -45,7 +49,7 @@ int _sow(Board *board, int start_pit) {
   return (start_pit + stones) % N_PITS;
 }
 
-MoveCheck _check_catch(Board *board, int pit, Side side) {
+static MoveCheck _check_catch(Board *board, int pit, Side side) {
   int total_stones = 0;
   for (size_t i = side; i < side + PITS_PER_SIDE; i++) {
     total_stones += board->pits[i];
@@ -61,7 +65,7 @@ MoveCheck _check_catch(Board *board, int pit, Side side) {
                                                             : MOVE_OK;
 }
 
-int _catch(Board *board, int pit, Side side) {
+static int _catch(Board *board, int pit, Side side) {
   if (!is_side(side, pit) || !TWO_OR_THREE(board->pits[pit])) {
     return 0;
   }

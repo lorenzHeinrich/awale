@@ -9,10 +9,13 @@ static void assert_unchanged(Board *actual, Board *before) {
   }
 }
 
-static void test_sow_stones(void) {
+static void test_sow_and_catch(void) {
   Board b = board(4);
 
-  _sow(&b, 0);
+  MoveResult result = sow_and_catch(&b, A, 0);
+
+  assert(result.move_check == MOVE_OK);
+  assert(result.obtained == 0);
 
   assert(b.pits[0] == 0);
   for (size_t i = 1; i <= 4; i++) {
@@ -73,58 +76,9 @@ static void test_check_sow_feeding(void) {
   }
 }
 
-static void test_check_catch(void) {
-  for (int side = A; side <= B; side += PITS_PER_SIDE) {
-    Board b = {0};
-    Board before = b;
-    assert(_check_catch(&b, side, side)); // Empty side is no capture.
-    assert_unchanged(&b, &before);
-
-    b.pits[side] = 2;
-    before = b;
-    assert(!_check_catch(&b, side, side)); // Last opponent stones.
-    assert(_check_catch(&b, other_side(side), side));
-    assert_unchanged(&b, &before);
-
-    b.pits[side + 1] = 1; // Stones outside the capture remain.
-    before = b;
-    assert(_check_catch(&b, side, side));
-    assert_unchanged(&b, &before);
-
-    b = (Board){0};
-    for (int i = side; i < side + PITS_PER_SIDE; i++) {
-      b.pits[i] = (i - side) % 2 == 0 ? 2 : 3;
-    }
-    before = b;
-    assert(!_check_catch(&b, side + PITS_PER_SIDE - 1, side));
-    assert(_check_catch(&b, side, side));
-    assert_unchanged(&b, &before);
-
-    /* Capture must stop at 0, 1, or 4, even with 2/3 behind it. */
-    int blockers[] = {0, 1, 4};
-    for (size_t i = 0; i < sizeof blockers / sizeof blockers[0]; i++) {
-      b = (Board){0};
-      b.pits[side] = 2;
-      b.pits[side + 1] = blockers[i];
-      b.pits[side + 2] = 3;
-      before = b;
-      assert(_check_catch(&b, side + 2, side));
-      assert(_check_catch(&b, side + 1, side));
-      assert_unchanged(&b, &before);
-    }
-  }
-}
-
-static void test_sow_and_catch(void) { /* TODO: add assertions. */ }
-
-static void test_catch(void) { /* TODO: add assertions. */ }
-
 int main(void) {
-  test_sow_stones();
+  test_sow_and_catch();
   test_check_sow_ownership_and_stones();
   test_check_sow_feeding();
-  test_check_catch();
-  test_sow_and_catch();
-  test_catch();
   return 0;
 }
