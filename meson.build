@@ -30,7 +30,26 @@ inc = include_directories('src')
 board_test = executable(
   'board-test',
   ['tests/awale/board_test.c', 'src/awale/board.c'],
-  include_directories: inc,
+  include_directories : inc,
 )
 
-test('test', board_test)
+moves_test = executable(
+  'moves-test',
+  ['tests/awale/moves_test.c', 'src/awale/moves.c', 'src/awale/board.c'],
+  include_directories : inc,
+)
+
+awale_test = executable(
+  'awale-test',
+  [
+    'tests/awale/awale_test.c',
+    'src/awale/awale.c',
+    'src/awale/moves.c',
+    'src/awale/board.c',
+  ],
+  include_directories : inc,
+)
+
+test('board', board_test)
+test('moves', moves_test)
+test('awale', awale_test)
