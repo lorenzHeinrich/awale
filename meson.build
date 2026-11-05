@@ -51,5 +51,38 @@ awale_test = executable(
 )
 
 test('board', board_test)
-test('moves', moves_test)
-test('awale', awale_test)
+
+
+foreach case_name : [
+  'sow_and_catch',
+  'check_sow_ownership_and_stones',
+  'check_sow_feeding',
+  'capture_single',
+  'capture_chain',
+  'capture_blockers',
+  'capture_stops_at_own_side',
+  'capture_lands_on_own_side',
+  'grand_slam_chain',
+  'sowing_wraparound',
+  'sowing_skip_origin',
+  'sowing_multiple_laps',
+  'sowing_capture_after_skip',
+  'rejected_moves',
+]
+  test('moves/' + case_name, moves_test, args : [case_name])
+endforeach
+
+foreach case_name : [
+  'player_for_side',
+  'move',
+  'move_grand_slam',
+  'new_game',
+  'rejected_moves',
+  'finished_game',
+  'capture_scores',
+  'winning_score',
+  'no_feed_winner',
+  'no_feed_draw',
+]
+  test('awale/' + case_name, awale_test, args : [case_name])
+endforeach
