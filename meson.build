@@ -14,6 +14,7 @@ sources = files(
   'src/awale/awale.c',
   'src/awale/board.c',
   'src/awale/moves.c',
+  'src/socket.c',
   'src/main.c',
 )
 
