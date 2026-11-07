@@ -1,4 +1,6 @@
 #include "src/socket.h"
+#include "src/log.h"
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -16,11 +18,11 @@ bool server_socket(in_addr_t addr, int port, Socket *sock) {
   sock->sockaddr_in = sock_addr(addr, port);
   if (bind(sock->fd, (struct sockaddr *)&sock->sockaddr_in,
            sizeof(sock->sockaddr_in)) < 0) {
-    perror("server_socket bind");
+    LOG_ERROR("server_socket bind");
     return false;
   }
   if (listen(sock->fd, 5) < 0) {
-    perror("server_socket listen");
+    LOG_ERROR("server_socket listen: %m");
     return false;
   }
   return true;
@@ -31,7 +33,7 @@ bool accept_connection(int fd, Socket *sock) {
   socklen_t len = sizeof(client_addr);
   int conn_fd = accept(fd, (struct sockaddr *)&client_addr, &len);
   if (conn_fd < 0) {
-    perror("accept_connection");
+    LOG_ERROR("accept_connection: %m");
     return false;
   }
   sock->fd = conn_fd;
@@ -54,7 +56,7 @@ bool client_connect(in_addr_t server_addr, int port, Socket *sock) {
 static bool new_socket(int *fd) {
   *fd = socket(AF_INET, SOCK_STREAM, 0);
   if (*fd < 0) {
-    perror("new_socket");
+    LOG_ERROR("new_socket: %m");
     return false;
   }
   return true;
@@ -66,4 +68,10 @@ static struct sockaddr_in sock_addr(in_addr_t addr, int port) {
       .sin_port = htons(port),
       .sin_addr = {addr},
   };
+}
+void socket_to_str(const Socket *sock, char *buf, size_t len) {
+  char addr_str[INET_ADDRSTRLEN];
+  inet_ntop(AF_INET, &sock->sockaddr_in.sin_addr, addr_str, sizeof addr_str);
+  snprintf(buf, len, "Socket{fd=%d, addr=%s, port=%d}", sock->fd, addr_str,
+           ntohs(sock->sockaddr_in.sin_port));
 }
