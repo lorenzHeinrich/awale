@@ -21,9 +21,11 @@ common = files(
   'src/awale/board.c',
   'src/awale/moves.c',
   'src/socket.c',
+  'src/utils.c',
 )
 
 executable('awale_server', common, 'src/awale_server.c')
+executable('awale_client', common, 'src/awale_client.c')
 
 executable(
   'awale_cli',

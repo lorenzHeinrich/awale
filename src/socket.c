@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 static bool new_socket(int *fd);
 
@@ -48,8 +49,35 @@ bool client_connect(in_addr_t server_addr, int port, Socket *sock) {
   sock->sockaddr_in = sock_addr(server_addr, port);
   if (connect(sock->fd, (struct sockaddr *)&sock->sockaddr_in,
               sizeof(sock->sockaddr_in)) < 0) {
+    LOG_ERROR("client_connect: %m");
     return false;
   };
+  return true;
+}
+
+bool socket_send(int fd, char *msg, int msg_len) {
+  if (write(fd, msg, msg_len) < 0) {
+    LOG_ERROR("socket_send: %m");
+    return false;
+  }
+  return true;
+}
+
+bool socket_read(int fd, char *msg, int msg_len) {
+  ssize_t n_read = read(fd, msg, msg_len);
+  if (n_read < 0) {
+    LOG_ERROR("socket_read: %m");
+    return false;
+  }
+  if (n_read == 0) {
+    LOG_WARN("Client disconnected");
+    return false;
+  }
+  if (n_read >= msg_len) {
+    LOG_ERROR("Message overflow");
+    return false;
+  }
+  msg[msg_len - 1] = '\0';
   return true;
 }
 

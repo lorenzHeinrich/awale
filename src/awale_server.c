@@ -36,7 +36,7 @@ void start(GameServer *game_server) {
       continue;
     }
     char buf[64];
-    socket_to_str(&game_server->socket, buf, sizeof buf);
+    socket_to_str(&client, buf, sizeof buf);
     LOG_INFO("Acceped new connection from client on %s", buf);
     pthread_t tid;
     pthread_create(&tid, NULL, game_loop, ((void *)&client));
@@ -44,40 +44,26 @@ void start(GameServer *game_server) {
   }
 }
 
-static bool prompt_client(int fd, char *prompt, char *resp, int resp_len) {
+bool server_interact(int fd, char *prompt, char *resp, int resp_len) {
   while (true) {
-    if (write(fd, prompt, strlen(prompt)) < 0) {
-      LOG_ERROR("prompt_client write: %m");
-      return false;
-    }
-    ssize_t n_read = read(fd, resp, resp_len);
-
-    if (n_read < 0) {
-      LOG_ERROR("prompt_client read: %m");
-      return false;
-    }
-    if (n_read == EOF) {
-      printf("client disconnected");
-      return false;
-    }
-    if (n_read < resp_len) {
-      resp[resp_len - 1] = '\0';
-      return true;
+    if (!socket_read(fd, prompt, resp_len)) {
+      continue;
     }
   }
 }
 
 static bool get_name(int fd, char *name, int length) {
   char *prompt = "Hello! - Please enter your name:";
-  return prompt_client(fd, prompt, name, length);
+  return server_interact(fd, prompt, name, length);
 }
 
 static void *game_loop(void *args) {
   Socket *client = (Socket *)args;
 
   char name[PLAYER_NAME_MAX_LENGTH + 1];
-  get_name(client->fd, name, sizeof(name));
-  printf("Received %s\nBye!\n", name);
+  if (get_name(client->fd, name, sizeof(name)))
+    printf("Received %s\nBye!\n", name);
+
   return NULL;
 }
 
