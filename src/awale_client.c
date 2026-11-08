@@ -3,6 +3,7 @@
 #include "src/socket.h"
 #include "src/utils.h"
 #include <arpa/inet.h>
+#include <readline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -23,6 +24,11 @@ bool game_client(GameClient *game_client, char *server_addr, int port) {
   socket_to_str(&sock, buf, sizeof buf);
   LOG_DEBUG("Connected client to %s", buf);
   return true;
+}
+
+static bool client_interact(int fd) {
+  while (true) {
+  }
 }
 
 int main(int argc, char **argv) {

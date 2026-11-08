@@ -17,22 +17,28 @@ add_project_arguments(
 )
 
 common = files(
-  'src/awale/awale.c',
-  'src/awale/board.c',
-  'src/awale/moves.c',
   'src/socket.c',
   'src/utils.c',
 )
 
-executable('awale_server', common, 'src/awale_server.c')
+server = files(
+  'src/awale/awale.c',
+  'src/awale/board.c',
+  'src/awale/moves.c',
+  'src/awale_server.c',
+  'src/commands/command.c',
+  'src/commands/move_command.c',
+)
+
+executable('awale_server', common, server)
 executable('awale_client', common, 'src/awale_client.c')
 
-executable(
-  'awale_cli',
-  common,
-  'src/awale_cli.c',
-  dependencies: dependencies,
-)
+# executable(
+#  'awale_cli',
+#  common,
+#  'src/awale_cli.c',
+#  dependencies: dependencies,
+# )
 
 inc = include_directories('src')
 
