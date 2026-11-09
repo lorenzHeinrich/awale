@@ -65,6 +65,19 @@ char *awale_on_players(const CmdArgs args, ClientRegistry *registry,
 char *awale_on_help(const CmdArgs args, ClientRegistry *registry,
                     size_t client_slot);
 
+char *awale_on_invite(const CmdArgs args, ClientRegistry *registry,
+                      size_t client_slot);
+extern const ArgKind on_invite_args[];
+extern const size_t on_invite_n_args;
+
+char *awale_on_invites(const CmdArgs args, ClientRegistry *registry,
+                       size_t client_slot);
+
+char *awale_on_accept(const CmdArgs args, ClientRegistry *registry,
+                      size_t client_slot);
+extern const ArgKind on_accept_args[];
+extern const size_t on_accept_n_args;
+
 char *on_register(const CmdArgs args, ClientRegistry *registry,
                   size_t client_slot);
 extern const ArgKind on_register_args[];

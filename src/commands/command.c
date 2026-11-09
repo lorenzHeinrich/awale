@@ -1,5 +1,6 @@
 #include "src/commands/command.h"
 #include "arg_parser.h"
+#include "src/log.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -16,6 +17,14 @@ const size_t on_leave_n_args = 1;
 // client name
 const ArgKind on_register_args[] = {ARG_STR};
 const size_t on_register_n_args = 1;
+
+// player name to invite
+const ArgKind on_invite_args[] = {ARG_STR};
+const size_t on_invite_n_args = 1;
+
+// player name to accept invite from
+const ArgKind on_accept_args[] = {ARG_STR};
+const size_t on_accept_n_args = 1;
 
 const Command commands[] = {
     (Command){
@@ -48,6 +57,24 @@ const Command commands[] = {
         .arg_types = NULL,
         .n_args = 0,
     },
+    (Command){
+        .name = "invite",
+        .fn = awale_on_invite,
+        .arg_types = on_invite_args,
+        .n_args = on_invite_n_args,
+    },
+    (Command){
+        .name = "invites",
+        .fn = awale_on_invites,
+        .arg_types = NULL,
+        .n_args = 0,
+    },
+    (Command){
+        .name = "accept",
+        .fn = awale_on_accept,
+        .arg_types = on_accept_args,
+        .n_args = on_accept_n_args,
+    },
 };
 
 const size_t n_commands = sizeof commands / sizeof commands[0];
@@ -60,12 +87,19 @@ char *exec_cmd(char *args, ClientRegistry *registry, size_t client_slot) {
   }
   Command cmd = {0};
   if (!parse_cmd(&cmd, tokens, args)) {
+    LOG_WARN("slot %zu: could not parse command line \"%s\"", client_slot,
+             args);
     return "Parse Error";
   }
   CmdArgs cmd_args = {0};
   if (!parse_args(cmd, tokens, &cmd_args)) {
+    LOG_WARN("slot %zu: invalid arguments for command \"%s\"", client_slot,
+             cmd.name);
     return "Parse Error";
   }
 
-  return cmd.fn(cmd_args, registry, client_slot);
+  LOG_INFO("slot %zu: executing \"%s\"", client_slot, cmd.name);
+  char *result = cmd.fn(cmd_args, registry, client_slot);
+  LOG_DEBUG("slot %zu: \"%s\" -> \"%s\"", client_slot, cmd.name, result);
+  return result;
 }

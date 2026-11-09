@@ -26,6 +26,18 @@ char *awale_on_help(const CmdArgs args, ClientRegistry *registry,
                     size_t client_slot) {
   return "";
 }
+char *awale_on_invite(const CmdArgs args, ClientRegistry *registry,
+                      size_t client_slot) {
+  return "";
+}
+char *awale_on_invites(const CmdArgs args, ClientRegistry *registry,
+                       size_t client_slot) {
+  return "";
+}
+char *awale_on_accept(const CmdArgs args, ClientRegistry *registry,
+                      size_t client_slot) {
+  return "";
+}
 
 static void test_parse_cmd_move(void) {
   Command cmd;

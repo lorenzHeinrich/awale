@@ -1,7 +1,6 @@
 #include "src/commands/arg_parser.h"
 #include "src/commands/command.h"
 #include "src/log.h"
-#include "src/utils.h"
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>

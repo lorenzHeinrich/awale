@@ -9,9 +9,12 @@
 #define MAX_CLIENTS 128
 #define PLAYER_NAME_MAX_LENGTH 31
 
+struct Match;
+
 typedef struct GameClient {
   char name[PLAYER_NAME_MAX_LENGTH];
   Socket socket;
+  struct Match *current_match; /* NULL = no match */
 } GameClient;
 
 typedef struct ClientRegistry {
@@ -32,5 +35,15 @@ void clients_with_slot(ClientRegistry *registry, size_t slot, ClientFn fn,
 
 typedef void (*ClientVisitor)(const GameClient *client, size_t slot, void *ctx);
 void clients_for_each(ClientRegistry *registry, ClientVisitor fn, void *ctx);
+
+/* Two-slot transaction (same lock, so atomic): e.g. invite touches both
+   players at once. */
+typedef void (*ClientPairFn)(GameClient *a, GameClient *b, void *ctx);
+void clients_with_two_slots(ClientRegistry *registry, size_t slot_a,
+                            size_t slot_b, ClientPairFn fn, void *ctx);
+
+/* Clears and frees the match of the client in slot (and the opponent's
+   pointer). Call on disconnect. */
+void clients_clear_match(ClientRegistry *registry, size_t slot);
 
 #endif // !CLIENTS_H

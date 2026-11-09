@@ -18,7 +18,6 @@ add_project_arguments(
 
 common = files(
   'src/socket.c',
-  'src/utils.c',
 )
 
 server = files(
@@ -27,10 +26,14 @@ server = files(
   'src/awale/moves.c',
   'src/awale_server.c',
   'src/clients.c',
+  'src/match.c',
   'src/commands/arg_parser.c',
   'src/commands/command.c',
   'src/commands/leave_command.c',
   'src/commands/help_command.c',
+  'src/commands/invite_command.c',
+  'src/commands/invites_command.c',
+  'src/commands/accept_command.c',
   'src/commands/list_command.c',
   'src/commands/move_command.c',
   'src/commands/preconditions.c',
@@ -38,7 +41,31 @@ server = files(
 )
 
 executable('awale_server', common, server)
-executable('awale_client', common, 'src/awale_client.c', dependencies: dependencies)
+client_commands = files(
+  'src/awale/awale.c',
+  'src/awale/board.c',
+  'src/awale/moves.c',
+  'src/clients.c',
+  'src/match.c',
+  'src/commands/arg_parser.c',
+  'src/commands/command.c',
+  'src/commands/help_command.c',
+  'src/commands/invite_command.c',
+  'src/commands/invites_command.c',
+  'src/commands/accept_command.c',
+  'src/commands/leave_command.c',
+  'src/commands/list_command.c',
+  'src/commands/move_command.c',
+  'src/commands/preconditions.c',
+  'src/commands/register_command.c',
+)
+
+executable(
+  'awale_client',
+  common,
+  ['src/awale_client.c'] + client_commands,
+  dependencies: dependencies,
+)
 
 #executable(
 #'awale_cli',
@@ -115,7 +142,6 @@ command_test = executable(
     'tests/command_test.c',
     'src/commands/command.c',
     'src/commands/arg_parser.c',
-    'src/utils.c',
   ],
   include_directories: inc,
 )

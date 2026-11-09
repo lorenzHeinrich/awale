@@ -59,13 +59,14 @@ static void *game_loop(void *args) {
   GameServer *server = ga->server;
   size_t slot = ga->slot;
   char buf[64];
-  socket_to_str(&server->socket, buf, 64);
-  LOG_INFO("Start interacting with %s", buf);
+  socket_to_str(&server->registry.clients[slot].socket, buf, sizeof buf);
+  LOG_INFO("Session start: slot %zu, client %s", slot, buf);
   server_interact(server->registry.clients[slot].socket.fd, server, slot);
   socket_close(server->registry.clients[slot].socket.fd);
+  clients_clear_match(&server->registry, slot);
   disconnect_client(&server->registry, slot);
   free(ga);
-  LOG_INFO("Ending session with %s", buf);
+  LOG_INFO("Session end: slot %zu freed, client %s", slot, buf);
   return NULL;
 }
 
@@ -84,9 +85,10 @@ void start(GameServer *game_server) {
     int slot = next_free_client_slot(&game_server->registry);
     if (slot < 0) {
       socket_close(client.fd);
-      LOG_DEBUG("Server full, rejecting connection");
+      LOG_WARN("Server full (%d clients), rejecting %s", MAX_CLIENTS, buf);
       continue;
     }
+    LOG_DEBUG("Claimed client slot %d for %s", slot, buf);
     game_server->registry.clients[slot] =
         (GameClient){.name = {0}, .socket = client};
 
