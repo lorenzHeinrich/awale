@@ -2,6 +2,8 @@
 
 #define SOCKET_H
 
+#define MAX_SEND_LENGTH 1024
+
 #include <netinet/in.h>
 #include <stdbool.h>
 #include <stddef.h>

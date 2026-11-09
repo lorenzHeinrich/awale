@@ -5,7 +5,6 @@
 #include "src/awale/board.h"
 #include "src/awale/moves.h"
 
-#define PLAYER_NAME_MAX_LENGTH 31
 
 typedef struct Player {
   char *name;

@@ -1,5 +1,6 @@
 
 #include "src/awale/awale.h"
+#include "src/clients.h"
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>

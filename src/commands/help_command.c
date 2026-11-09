@@ -2,10 +2,10 @@
 #include "src/log.h"
 #include <stdio.h>
 
-char* awale_on_help(const CmdArgs args, GameServer* server,
+char *awale_on_help(const CmdArgs args, ClientRegistry *registry,
                     size_t client_slot) {
   (void)args;
-  (void)server;
+  (void)registry;
   (void)client_slot;
   static _Thread_local char resp[MAX_SEND_LENGTH];
   size_t off = 0;

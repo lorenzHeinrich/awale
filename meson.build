@@ -26,6 +26,7 @@ server = files(
   'src/awale/board.c',
   'src/awale/moves.c',
   'src/awale_server.c',
+  'src/clients.c',
   'src/commands/arg_parser.c',
   'src/commands/command.c',
   'src/commands/leave_command.c',

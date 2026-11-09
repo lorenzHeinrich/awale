@@ -1,42 +1,44 @@
-#include "src/awale_server.h"
+#include "src/clients.h"
 #include "src/commands/command.h"
 #include "src/commands/preconditions.h"
 #include "src/log.h"
-#include <pthread.h>
 #include <stdio.h>
 
-char* awale_on_players(const CmdArgs args, GameServer* server,
+typedef struct {
+  char *resp;
+  size_t off;
+  bool full;
+} ListCtx;
+
+static void append_player(const GameClient *client, size_t slot, void *ctx) {
+  (void)slot;
+  ListCtx *c = ctx;
+  if (c->full || client->socket.fd == -1) {
+    return; /* free slot */
+  }
+  const char *name = client->name[0] != '\0' ? client->name : "(unnamed)";
+  int n = snprintf(c->resp + c->off, MAX_SEND_LENGTH - c->off, "%s\n", name);
+  if (n < 0 || (size_t)n >= MAX_SEND_LENGTH - c->off) {
+    c->off = MAX_SEND_LENGTH - 1; /* truncated */
+    c->full = true;
+    return;
+  }
+  c->off += (size_t)n;
+}
+
+char *awale_on_players(const CmdArgs args, ClientRegistry *registry,
                        size_t client_slot) {
   (void)args;
-  if (!client_is_registered(server, client_slot)) {
+  if (!client_is_registered(registry, client_slot)) {
     return "Not registered";
   }
   /* Thread-local so concurrent game threads don't clobber each other. */
   static _Thread_local char resp[MAX_SEND_LENGTH];
-  size_t off = 0;
-
-  pthread_mutex_lock(&server->clients_lock);
-  for (size_t i = 0; i < MAX_CLIENTS; i++) {
-    if (server->clients[i].socket.fd == -1) {
-      continue; /* free slot */
-    }
-    const char* name = server->clients[i].name[0] != '\0'
-                           ? server->clients[i].name
-                           : "(unnamed)";
-    /* Multiline is fine: messages are '\0'-terminated, not newline-delimited.
-     */
-    int n = snprintf(resp + off, MAX_SEND_LENGTH - off, "%s\n", name);
-    if (n < 0 || (size_t)n >= MAX_SEND_LENGTH - off) {
-      off = MAX_SEND_LENGTH - 1; /* truncated */
-      break;
-    }
-    off += (size_t)n;
-  }
-  pthread_mutex_unlock(&server->clients_lock);
-
-  if (off == 0) {
+  ListCtx ctx = {.resp = resp, .off = 0, .full = false};
+  clients_for_each(registry, append_player, &ctx);
+  if (ctx.off == 0) {
     return "No players connected";
   }
-  resp[off] = '\0';
+  resp[ctx.off] = '\0';
   return resp;
 }

@@ -1,19 +1,35 @@
-#include "src/awale_server.h"
+#include "src/awale/awale.h"
+#include "src/clients.h"
 #include "src/commands/command.h"
-#include "src/commands/preconditions.h"
 #include "src/log.h"
 #include <stddef.h>
 #include <string.h>
 
-char *on_register(const CmdArgs args, GameServer *server, size_t client_slot) {
+typedef struct {
+  const char *name;
+  const char *result;
+} RegisterCtx;
+
+/* Runs under clients_lock: the check and the write are atomic. */
+static void do_register(GameClient *client, void *ctx) {
+  RegisterCtx *c = ctx;
+  if (client->name[0] != '\0') {
+    c->result = "Already registered";
+    return;
+  }
+  if (strlen(c->name) >= PLAYER_NAME_MAX_LENGTH) {
+    c->result = "Name too long";
+    return;
+  }
+  strcpy(client->name, c->name);
+  c->result = "Registered";
+}
+
+char *on_register(const CmdArgs args, ClientRegistry *registry,
+                  size_t client_slot) {
   char *name = args.argv[0].as.arg_str.str_value;
   LOG_DEBUG("trying to register client %s", name);
-  if (client_is_registered(server, client_slot)) {
-    return "Already registered";
-  }
-  if (strlen(name) >= PLAYER_NAME_MAX_LENGTH) {
-    return "Name too long";
-  }
-  strcpy(server->clients[client_slot].name, name);
-  return "Registered";
+  RegisterCtx ctx = {.name = name, .result = NULL};
+  clients_with_slot(registry, client_slot, do_register, &ctx);
+  return (char *)ctx.result;
 }
