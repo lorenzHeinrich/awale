@@ -4,14 +4,14 @@
 #include <string.h>
 
 /* Stubs for the command handlers referenced by the commands[] table. */
-void on_register(const CmdArgs args) { (void)args; }
-void awale_on_move(const CmdArgs args) { (void)args; }
-void awale_on_leave(const CmdArgs args) { (void)args; }
+char *on_register(const CmdArgs args) { return ""; }
+char *awale_on_move(const CmdArgs args) { return ""; }
+char *awale_on_leave(const CmdArgs args) { return ""; }
 
 static void test_parse_cmd_move(void) {
   Command cmd;
   char token_bufs[MAX_ARGS][MAX_ARG_LEN];
-  char* tokens[MAX_ARGS];
+  char *tokens[MAX_ARGS];
   for (size_t i = 0; i < MAX_ARGS; i++) {
     tokens[i] = token_bufs[i];
   }
@@ -33,7 +33,7 @@ static void test_parse_args_move(void) {
   };
   char t0[] = "1";
   char t1[] = "2";
-  char* tokens[] = {t0, t1};
+  char *tokens[] = {t0, t1};
   CmdArgs args = {0};
 
   assert(parse_args(cmd, tokens, &args));
@@ -46,7 +46,7 @@ static void test_parse_args_move(void) {
 
 static void test_parse_cmd_unknown(void) {
   Command cmd;
-  char* tokens[MAX_ARGS] = {0};
+  char *tokens[MAX_ARGS] = {0};
   char line[] = "bogus 1 2";
 
   assert(!parse_cmd(&cmd, tokens, line));
@@ -54,7 +54,7 @@ static void test_parse_cmd_unknown(void) {
 
 static void test_parse_cmd_wrong_argc(void) {
   Command cmd;
-  char* tokens[MAX_ARGS] = {0};
+  char *tokens[MAX_ARGS] = {0};
   char line[] = "move 1 2 3";
 
   assert(!parse_cmd(&cmd, tokens, line));
@@ -62,7 +62,7 @@ static void test_parse_cmd_wrong_argc(void) {
 
 static void test_parse_cmd_too_many_tokens(void) {
   Command cmd;
-  char* tokens[MAX_ARGS] = {0};
+  char *tokens[MAX_ARGS] = {0};
   char line[] = "move 1 2 3 4 5";
 
   assert(!parse_cmd(&cmd, tokens, line));
@@ -70,7 +70,7 @@ static void test_parse_cmd_too_many_tokens(void) {
 
 static void test_parse_cmd_empty(void) {
   Command cmd;
-  char* tokens[MAX_ARGS] = {0};
+  char *tokens[MAX_ARGS] = {0};
   char line[] = "";
 
   assert(!parse_cmd(&cmd, tokens, line));
@@ -85,7 +85,7 @@ static void test_parse_args_non_int(void) {
   };
   char t0[] = "abc";
   char t1[] = "2";
-  char* tokens[] = {t0, t1};
+  char *tokens[] = {t0, t1};
   CmdArgs args = {0};
 
   assert(!parse_args(cmd, tokens, &args));
@@ -100,7 +100,7 @@ static void test_parse_args_int_out_of_range(void) {
   };
   char t0[] = "12"; /* max is 11 */
   char t1[] = "2";
-  char* tokens[] = {t0, t1};
+  char *tokens[] = {t0, t1};
   CmdArgs args = {0};
 
   assert(!parse_args(cmd, tokens, &args));
@@ -114,14 +114,14 @@ static void test_parse_args_empty_str(void) {
       .n_args = on_register_n_args,
   };
   char t0[] = "";
-  char* tokens[] = {t0};
+  char *tokens[] = {t0};
   CmdArgs args = {0};
 
   assert(!parse_args(cmd, tokens, &args));
 }
 
 /* An optional case name lets Meson report failures independently. */
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   if (argc == 1 || strcmp(argv[1], "parse_cmd") == 0) {
     test_parse_cmd_move();
     if (argc > 1) {

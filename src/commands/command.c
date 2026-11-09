@@ -40,18 +40,20 @@ const Command commands[] = {
 
 const size_t n_commands = sizeof commands / sizeof commands[0];
 
-void exec_cmd(char* args) {
+char *exec_cmd(char *args) {
   char token_bufs[MAX_ARGS][MAX_ARG_LEN];
-  char* tokens[MAX_ARGS];
+  char *tokens[MAX_ARGS];
   for (size_t i = 0; i < MAX_ARGS; i++) {
     tokens[i] = token_bufs[i];
   }
   Command cmd = {0};
   if (!parse_cmd(&cmd, tokens, args)) {
-    return;
+    return "Parse Error";
   }
   CmdArgs cmd_args = {0};
-  if (parse_args(cmd, tokens, &cmd_args)) {
-    cmd.fn(cmd_args);
+  if (!parse_args(cmd, tokens, &cmd_args)) {
+    return "Parse Error";
   }
+
+  return cmd.fn(cmd_args);
 }
