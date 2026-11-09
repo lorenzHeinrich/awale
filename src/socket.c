@@ -96,7 +96,19 @@ bool socket_read_str(int fd, char *msg, int msg_len) {
       return true;
     }
   }
+  /* Buffer full without a newline: discard the rest of the line so the
+     next read starts at a message boundary. */
   LOG_ERROR("Message overflow");
+  char discard[64];
+  while (true) {
+    ssize_t n = read(fd, discard, sizeof discard);
+    if (n <= 0) {
+      return false; /* read error or disconnect */
+    }
+    if (memchr(discard, '\n', (size_t)n) != NULL) {
+      break;
+    }
+  }
   return false;
 }
 

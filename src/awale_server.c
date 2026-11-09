@@ -9,10 +9,10 @@
 #include <stddef.h>
 #include <unistd.h>
 
-static void* game_loop(void* args);
+static void *game_loop(void *args);
 static bool server_interact(int fd);
 
-bool game_server(GameServer* game_server, int port) {
+bool game_server(GameServer *game_server, int port) {
   Socket sock;
   if (!server_socket(htonl(INADDR_ANY), port, &sock)) {
     return false;
@@ -25,7 +25,7 @@ bool game_server(GameServer* game_server, int port) {
   return true;
 }
 
-void start(GameServer* game_server) {
+void start(GameServer *game_server) {
   game_server->running = true;
   LOG_INFO("Started Awale game server!");
   while (game_server->running) {
@@ -54,8 +54,8 @@ void start(GameServer* game_server) {
   }
 }
 
-static void* game_loop(void* args) {
-  GameClient* client = (GameClient*)args;
+static void *game_loop(void *args) {
+  GameClient *client = (GameClient *)args;
   server_interact(client->socket.fd);
   return NULL;
 }
