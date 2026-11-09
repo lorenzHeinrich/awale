@@ -78,6 +78,9 @@ char *awale_on_accept(const CmdArgs args, ClientRegistry *registry,
 extern const ArgKind on_accept_args[];
 extern const size_t on_accept_n_args;
 
+char *awale_on_match(const CmdArgs args, ClientRegistry *registry,
+                     size_t client_slot);
+
 char *on_register(const CmdArgs args, ClientRegistry *registry,
                   size_t client_slot);
 extern const ArgKind on_register_args[];

@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 
-// game id, move
-const ArgKind on_move_args[] = {ARG_INT, ARG_INT};
-const size_t on_move_n_args = 2;
+// pit to move from
+const ArgKind on_move_args[] = {ARG_INT};
+const size_t on_move_n_args = 1;
 
 // game id
 const ArgKind on_leave_args[] = {ARG_INT};
@@ -74,6 +74,12 @@ const Command commands[] = {
         .fn = awale_on_accept,
         .arg_types = on_accept_args,
         .n_args = on_accept_n_args,
+    },
+    (Command){
+        .name = "match",
+        .fn = awale_on_match,
+        .arg_types = NULL,
+        .n_args = 0,
     },
 };
 

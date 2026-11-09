@@ -38,6 +38,10 @@ char *awale_on_accept(const CmdArgs args, ClientRegistry *registry,
                       size_t client_slot) {
   return "";
 }
+char *awale_on_match(const CmdArgs args, ClientRegistry *registry,
+                     size_t client_slot) {
+  return "";
+}
 
 static void test_parse_cmd_move(void) {
   Command cmd;
@@ -46,13 +50,12 @@ static void test_parse_cmd_move(void) {
   for (size_t i = 0; i < MAX_ARGS; i++) {
     tokens[i] = token_bufs[i];
   }
-  char line[] = "move 1 2";
+  char line[] = "move 1";
 
   assert(parse_cmd(&cmd, tokens, line));
   assert(strcmp(cmd.name, "move") == 0);
-  assert(cmd.n_args == 2);
+  assert(cmd.n_args == 1);
   assert(strcmp(tokens[0], "1") == 0);
-  assert(strcmp(tokens[1], "2") == 0);
 }
 
 static void test_parse_args_move(void) {
@@ -63,16 +66,13 @@ static void test_parse_args_move(void) {
       .n_args = on_move_n_args,
   };
   char t0[] = "1";
-  char t1[] = "2";
-  char *tokens[] = {t0, t1};
+  char *tokens[] = {t0};
   CmdArgs args = {0};
 
   assert(parse_args(cmd, tokens, &args));
-  assert(args.argc == 2);
+  assert(args.argc == 1);
   assert(args.argv[0].kind == ARG_INT);
   assert(args.argv[0].as.arg_int.int_value == 1);
-  assert(args.argv[1].kind == ARG_INT);
-  assert(args.argv[1].as.arg_int.int_value == 2);
 }
 
 static void test_parse_cmd_unknown(void) {
@@ -86,7 +86,7 @@ static void test_parse_cmd_unknown(void) {
 static void test_parse_cmd_wrong_argc(void) {
   Command cmd;
   char *tokens[MAX_ARGS] = {0};
-  char line[] = "move 1 2 3";
+  char line[] = "move 1 2";
 
   assert(!parse_cmd(&cmd, tokens, line));
 }
@@ -115,8 +115,7 @@ static void test_parse_args_non_int(void) {
       .n_args = on_move_n_args,
   };
   char t0[] = "abc";
-  char t1[] = "2";
-  char *tokens[] = {t0, t1};
+  char *tokens[] = {t0};
   CmdArgs args = {0};
 
   assert(!parse_args(cmd, tokens, &args));
@@ -130,8 +129,7 @@ static void test_parse_args_int_out_of_range(void) {
       .n_args = on_move_n_args,
   };
   char t0[] = "12"; /* max is 11 */
-  char t1[] = "2";
-  char *tokens[] = {t0, t1};
+  char *tokens[] = {t0};
   CmdArgs args = {0};
 
   assert(!parse_args(cmd, tokens, &args));

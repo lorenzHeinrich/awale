@@ -99,6 +99,29 @@ void print_player(Player *player) {
          player->stone_bag);
 }
 
+int game_to_str(const Game *game, char *buf, size_t len) {
+  int n = board_to_str(&game->board, buf, len);
+  size_t off = n < 0 ? 0 : (size_t)n;
+  if (off < len) {
+    n = snprintf(buf + off, len - off, "Side %c, Player %s - [ %2d ]\n",
+                 game->player_a.side == A ? 'A' : 'B', game->player_a.name,
+                 game->player_a.stone_bag);
+    off += n < 0 ? 0 : (size_t)n;
+  }
+  if (off < len) {
+    n = snprintf(buf + off, len - off, "Side %c, Player %s - [ %2d ]\n",
+                 game->player_b.side == A ? 'A' : 'B', game->player_b.name,
+                 game->player_b.stone_bag);
+    off += n < 0 ? 0 : (size_t)n;
+  }
+  if (off < len) {
+    n = snprintf(buf + off, len - off, "turn: %c\n",
+                 game->turn == A ? 'A' : 'B');
+    off += n < 0 ? 0 : (size_t)n;
+  }
+  return (int)off;
+}
+
 void print_game(Game *game) {
   print_board(&game->board);
   print_player(&game->player_a);

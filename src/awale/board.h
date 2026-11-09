@@ -3,6 +3,7 @@
 #define BOARD_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #define PITS_PER_SIDE 6
 #define START_STONES_PER_PIT 4
 #define N_PITS (2 * PITS_PER_SIDE)
@@ -27,5 +28,8 @@ void put_stone(Board *board, int pit);
 int take_stones(Board *board, int pit);
 
 void print_board(Board *board);
+
+/* Renders the board like print_board, into buf; returns would-be length. */
+int board_to_str(const Board *board, char *buf, size_t len);
 
 #endif // !BOARD_H

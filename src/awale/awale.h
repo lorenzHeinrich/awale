@@ -5,7 +5,6 @@
 #include "src/awale/board.h"
 #include "src/awale/moves.h"
 
-
 typedef struct Player {
   char *name;
   Side side;
@@ -28,4 +27,7 @@ MoveResult move(Game *game, int pit);
 Game new_game(char *name_a, char *name_b);
 void print_game(Game *game);
 void print_player(Player *player);
+
+/* Renders the whole game (board + players + turn) into buf. */
+int game_to_str(const Game *game, char *buf, size_t len);
 #endif // !AWALE_H

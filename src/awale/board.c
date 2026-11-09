@@ -45,6 +45,46 @@ static void print_side(Board *board, Side side) {
   }
 }
 
+int board_to_str(const Board *board, char *buf, size_t len) {
+  size_t off = 0;
+  int n;
+  n = snprintf(buf + off, len - off, "   +");
+  off += n < 0 ? 0 : (size_t)n;
+  for (int i = 0; i < PITS_PER_SIDE; i++) {
+    n = snprintf(buf + off, off < len ? len - off : 0, "----+");
+    off += n < 0 ? 0 : (size_t)n;
+  }
+  n = snprintf(buf + off, off < len ? len - off : 0, "\nB: |");
+  off += n < 0 ? 0 : (size_t)n;
+  for (size_t i = 0; i < PITS_PER_SIDE; i++) {
+    n = snprintf(buf + off, off < len ? len - off : 0, " %2d |",
+                 board->pits[N_PITS - i - 1]);
+    off += n < 0 ? 0 : (size_t)n;
+  }
+  n = snprintf(buf + off, off < len ? len - off : 0, "\n   +");
+  off += n < 0 ? 0 : (size_t)n;
+  for (int i = 0; i < PITS_PER_SIDE; i++) {
+    n = snprintf(buf + off, off < len ? len - off : 0, "----+");
+    off += n < 0 ? 0 : (size_t)n;
+  }
+  n = snprintf(buf + off, off < len ? len - off : 0, "\nA: |");
+  off += n < 0 ? 0 : (size_t)n;
+  for (size_t i = 0; i < PITS_PER_SIDE; i++) {
+    n = snprintf(buf + off, off < len ? len - off : 0, " %2d |",
+                 board->pits[i]);
+    off += n < 0 ? 0 : (size_t)n;
+  }
+  n = snprintf(buf + off, off < len ? len - off : 0, "\n   +");
+  off += n < 0 ? 0 : (size_t)n;
+  for (int i = 0; i < PITS_PER_SIDE; i++) {
+    n = snprintf(buf + off, off < len ? len - off : 0, "----+");
+    off += n < 0 ? 0 : (size_t)n;
+  }
+  n = snprintf(buf + off, off < len ? len - off : 0, "\n");
+  off += n < 0 ? 0 : (size_t)n;
+  return (int)off;
+}
+
 void print_board(Board *board) {
   printf("   +");
   for (int i = 0; i < PITS_PER_SIDE; i++) {
