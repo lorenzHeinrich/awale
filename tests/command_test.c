@@ -1,12 +1,22 @@
+#include "awale_server.h"
 #include "commands/arg_parser.h"
 #include "commands/command.h"
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 /* Stubs for the command handlers referenced by the commands[] table. */
-char *on_register(const CmdArgs args) { return ""; }
-char *awale_on_move(const CmdArgs args) { return ""; }
-char *awale_on_leave(const CmdArgs args) { return ""; }
+char *on_register(const CmdArgs args, GameServer *server, size_t client_slot) {
+  return "";
+}
+char *awale_on_move(const CmdArgs args, GameServer *server,
+                    size_t client_slot) {
+  return "";
+}
+char *awale_on_leave(const CmdArgs args, GameServer *server,
+                     size_t client_slot) {
+  return "";
+}
 
 static void test_parse_cmd_move(void) {
   Command cmd;

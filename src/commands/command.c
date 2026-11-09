@@ -40,7 +40,7 @@ const Command commands[] = {
 
 const size_t n_commands = sizeof commands / sizeof commands[0];
 
-char *exec_cmd(char *args) {
+char *exec_cmd(char *args, GameServer *server, size_t client_slot) {
   char token_bufs[MAX_ARGS][MAX_ARG_LEN];
   char *tokens[MAX_ARGS];
   for (size_t i = 0; i < MAX_ARGS; i++) {
@@ -55,5 +55,5 @@ char *exec_cmd(char *args) {
     return "Parse Error";
   }
 
-  return cmd.fn(cmd_args);
+  return cmd.fn(cmd_args, server, client_slot);
 }

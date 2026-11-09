@@ -1,6 +1,7 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include "src/awale_server.h"
 #include <stddef.h>
 
 #define CMD_LEN 32
@@ -36,9 +37,12 @@ typedef struct CmdArgs {
   CmdArg argv[MAX_ARGS];
 } CmdArgs;
 
-typedef char *(*CmdFn)(const CmdArgs args);
+struct GameServer;
 
-char *exec_cmd(char *args);
+typedef char *(*CmdFn)(const CmdArgs args, GameServer *server,
+                       size_t client_slot);
+
+char *exec_cmd(char *args, GameServer *server, size_t client_slot);
 
 typedef struct {
   char *name;
@@ -47,15 +51,17 @@ typedef struct {
   size_t n_args;
 } Command;
 
-extern char *awale_on_move(const CmdArgs args);
+extern char *awale_on_move(const CmdArgs args, GameServer *server,
+                           size_t client_slot);
 extern const ArgKind on_move_args[];
 extern const size_t on_move_n_args;
 
-char *awale_on_leave(const CmdArgs args);
+char *awale_on_leave(const CmdArgs args, GameServer *server,
+                     size_t client_slot);
 extern const ArgKind on_leave_args[];
 extern const size_t on_leave_n_args;
 
-char *on_register(const CmdArgs args);
+char *on_register(const CmdArgs args, GameServer *server, size_t client_slot);
 extern const ArgKind on_register_args[];
 extern const size_t on_register_n_args;
 

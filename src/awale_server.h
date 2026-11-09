@@ -2,6 +2,7 @@
 
 #define AWALE_SERVER_H
 
+#include "src/awale/awale.h"
 #include "src/socket.h"
 #include <pthread.h>
 #include <stdbool.h>
@@ -11,6 +12,7 @@
 #define MAX_SEND_LENGTH 1024
 
 typedef struct GameClient {
+  char name[PLAYER_NAME_MAX_LENGTH];
   Socket socket;
 } GameClient;
 

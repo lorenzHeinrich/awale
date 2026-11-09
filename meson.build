@@ -30,6 +30,7 @@ server = files(
   'src/commands/command.c',
   'src/commands/leave_command.c',
   'src/commands/move_command.c',
+  'src/commands/preconditions.c',
   'src/commands/register_command.c',
 )
 
