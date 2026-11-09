@@ -56,8 +56,6 @@ extern const size_t on_move_n_args;
 
 char *awale_on_leave(const CmdArgs args, ClientRegistry *registry,
                      size_t client_slot);
-extern const ArgKind on_leave_args[];
-extern const size_t on_leave_n_args;
 
 char *awale_on_players(const CmdArgs args, ClientRegistry *registry,
                        size_t client_slot);

@@ -1,4 +1,3 @@
-#include "src/awale_server.h"
 #include "src/commands/arg_parser.h"
 #include "src/log.h"
 #include "src/socket.h"

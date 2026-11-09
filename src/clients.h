@@ -15,6 +15,7 @@ typedef struct GameClient {
   char name[PLAYER_NAME_MAX_LENGTH];
   Socket socket;
   struct Match *current_match; /* NULL = no match */
+  bool quit;
 } GameClient;
 
 typedef struct ClientRegistry {

@@ -1,5 +1,4 @@
 #include "src/commands/command.h"
-#include "src/log.h"
 #include <stdio.h>
 
 char *awale_on_help(const CmdArgs args, ClientRegistry *registry,

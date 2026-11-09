@@ -11,8 +11,6 @@ const ArgKind on_move_args[] = {ARG_INT};
 const size_t on_move_n_args = 1;
 
 // game id
-const ArgKind on_leave_args[] = {ARG_INT};
-const size_t on_leave_n_args = 1;
 
 // client name
 const ArgKind on_register_args[] = {ARG_STR};
@@ -42,8 +40,8 @@ const Command commands[] = {
     (Command){
         .name = "leave",
         .fn = awale_on_leave,
-        .arg_types = on_leave_args,
-        .n_args = on_leave_n_args,
+        .arg_types = NULL,
+        .n_args = 0,
     },
     (Command){
         .name = "players",

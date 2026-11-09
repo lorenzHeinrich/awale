@@ -1,4 +1,3 @@
-#include "src/awale/awale.h"
 #include "src/clients.h"
 #include "src/commands/command.h"
 #include "src/log.h"

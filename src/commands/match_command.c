@@ -2,7 +2,6 @@
 #include "src/clients.h"
 #include "src/commands/command.h"
 #include "src/commands/preconditions.h"
-#include "src/log.h"
 #include "src/match.h"
 #include <stdio.h>
 #include <string.h>

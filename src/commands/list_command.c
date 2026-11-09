@@ -1,7 +1,6 @@
 #include "src/clients.h"
 #include "src/commands/command.h"
 #include "src/commands/preconditions.h"
-#include "src/log.h"
 #include <stdio.h>
 
 typedef struct {

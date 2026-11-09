@@ -29,6 +29,10 @@ bool game_server(GameServer *game_server, int port) {
   return true;
 }
 
+static void read_quit(GameClient *client, void *ctx) {
+  *(bool *)ctx = client->quit;
+}
+
 static void server_interact(int fd, GameServer *server, size_t client_slot) {
   while (true) {
     char buf[MAX_INPUT_LEN];
@@ -50,6 +54,12 @@ static void server_interact(int fd, GameServer *server, size_t client_slot) {
     send_buf[res_len + 1] = '\0';
     if (!socket_send(fd, send_buf, res_len + 1)) {
       LOG_ERROR("Could not send response %s", send_buf);
+    }
+    bool quit = false;
+    clients_with_slot(&server->registry, client_slot, read_quit, &quit);
+    if (quit) {
+      LOG_INFO("slot %zu: session end requested by command", client_slot);
+      return;
     }
   }
 }
