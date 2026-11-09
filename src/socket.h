@@ -17,9 +17,11 @@ bool accept_connection(int fd, Socket *sock);
 
 bool client_connect(in_addr_t server_addr, int port, Socket *sock);
 
-bool socket_read(int fd, char *msg, int msg_len);
+bool socket_read_str(int fd, char *msg, int msg_len);
 
 bool socket_send(int fd, char *msg, int msg_len);
+
+bool socket_close(int fd);
 
 // Writes a string representation of sock into buf, truncated to len bytes.
 void socket_to_str(const Socket *sock, char *buf, size_t len);

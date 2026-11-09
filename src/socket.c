@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -16,6 +17,14 @@ bool server_socket(in_addr_t addr, int port, Socket *sock) {
   if (!new_socket(&sock->fd)) {
     return false;
   }
+
+  // make the socket rebind the the port
+  int opt = 1;
+  if (setsockopt(sock->fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof opt) < 0) {
+    LOG_ERROR("server_socket setsockopt: %m");
+    return false;
+  }
+
   sock->sockaddr_in = sock_addr(addr, port);
   if (bind(sock->fd, (struct sockaddr *)&sock->sockaddr_in,
            sizeof(sock->sockaddr_in)) < 0) {
@@ -56,28 +65,46 @@ bool client_connect(in_addr_t server_addr, int port, Socket *sock) {
 }
 
 bool socket_send(int fd, char *msg, int msg_len) {
-  if (write(fd, msg, msg_len) < 0) {
-    LOG_ERROR("socket_send: %m");
-    return false;
+  size_t sent = 0;
+  while (sent < (size_t)msg_len) {
+    ssize_t n = send(fd, msg + sent, msg_len - sent, MSG_NOSIGNAL);
+    if (n < 0) {
+      LOG_ERROR("socket_send: %m");
+      return false;
+    }
+    sent += (size_t)n;
   }
   return true;
 }
 
-bool socket_read(int fd, char *msg, int msg_len) {
-  ssize_t n_read = read(fd, msg, msg_len);
-  if (n_read < 0) {
-    LOG_ERROR("socket_read: %m");
+bool socket_read_str(int fd, char *msg, int msg_len) {
+  size_t len = 0;
+  while (len < (size_t)msg_len - 1) {
+    ssize_t n_read = read(fd, msg + len, msg_len - 1 - len);
+    if (n_read < 0) {
+      LOG_ERROR("socket_read: %m");
+      return false;
+    }
+    if (n_read == 0) {
+      LOG_WARN("Client disconnected");
+      return false;
+    }
+    len += (size_t)n_read;
+    char *nl = memchr(msg, '\n', len);
+    if (nl != NULL) {
+      *nl = '\0'; /* strip the delimiter */
+      return true;
+    }
+  }
+  LOG_ERROR("Message overflow");
+  return false;
+}
+
+bool socket_close(int fd) {
+  if (close(fd) < 0) {
+    LOG_ERROR("Cannot close socket %d", fd);
     return false;
   }
-  if (n_read == 0) {
-    LOG_WARN("Client disconnected");
-    return false;
-  }
-  if (n_read >= msg_len) {
-    LOG_ERROR("Message overflow");
-    return false;
-  }
-  msg[msg_len - 1] = '\0';
   return true;
 }
 

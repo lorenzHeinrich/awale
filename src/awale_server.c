@@ -1,5 +1,5 @@
 #include "src/awale_server.h"
-#include "src/awale/awale.h"
+#include "src/commands/command.h"
 #include "src/log.h"
 #include "src/socket.h"
 #include <bits/pthreadtypes.h>
@@ -7,12 +7,12 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <unistd.h>
 
-static void *game_loop(void *args);
+static void* game_loop(void* args);
+static bool server_interact(int fd);
 
-bool game_server(GameServer *game_server, int port) {
+bool game_server(GameServer* game_server, int port) {
   Socket sock;
   if (!server_socket(htonl(INADDR_ANY), port, &sock)) {
     return false;
@@ -25,7 +25,7 @@ bool game_server(GameServer *game_server, int port) {
   return true;
 }
 
-void start(GameServer *game_server) {
+void start(GameServer* game_server) {
   game_server->running = true;
   LOG_INFO("Started Awale game server!");
   while (game_server->running) {
@@ -37,33 +37,38 @@ void start(GameServer *game_server) {
     char buf[64];
     socket_to_str(&client, buf, sizeof buf);
     LOG_INFO("Acceped new connection from client on %s", buf);
+    if (game_server->n_connections >= MAX_CLIENTS) {
+      socket_close(client.fd);
+      LOG_DEBUG("Closing socket because there are %zu active connections",
+                game_server->n_connections);
+      continue;
+    }
+    game_server->clients[game_server->n_connections] = (GameClient){client};
+    game_server->n_connections++;
+
     pthread_t tid;
-    pthread_create(&tid, NULL, game_loop, ((void *)&client));
+    pthread_create(&tid, NULL, game_loop,
+                   &game_server->clients[game_server->n_connections - 1]);
+    LOG_DEBUG("Started new thread %lu", tid);
     pthread_detach(tid);
   }
 }
 
-bool server_interact(int fd, char *prompt, char *resp, int resp_len) {
+static void* game_loop(void* args) {
+  GameClient* client = (GameClient*)args;
+  server_interact(client->socket.fd);
+  return NULL;
+}
+
+static bool server_interact(int fd) {
   while (true) {
-    if (!socket_read(fd, prompt, resp_len)) {
+    char buf[MAX_INPUT_LEN];
+    if (!socket_read_str(fd, buf, MAX_INPUT_LEN)) {
+      LOG_ERROR("failed to read from socket");
       continue;
     }
+    exec_cmd(buf);
   }
-}
-
-static bool get_name(int fd, char *name, int length) {
-  char *prompt = "Hello! - Please enter your name:";
-  return server_interact(fd, prompt, name, length);
-}
-
-static void *game_loop(void *args) {
-  Socket *client = (Socket *)args;
-
-  char name[PLAYER_NAME_MAX_LENGTH + 1];
-  if (get_name(client->fd, name, sizeof(name)))
-    printf("Received %s\nBye!\n", name);
-
-  return NULL;
 }
 
 int main(void) {

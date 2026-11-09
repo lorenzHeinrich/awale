@@ -26,19 +26,22 @@ server = files(
   'src/awale/board.c',
   'src/awale/moves.c',
   'src/awale_server.c',
+  'src/commands/arg_parser.c',
   'src/commands/command.c',
+  'src/commands/leave_command.c',
   'src/commands/move_command.c',
+  'src/commands/register_command.c',
 )
 
 executable('awale_server', common, server)
-executable('awale_client', common, 'src/awale_client.c')
+executable('awale_client', common, 'src/awale_client.c', dependencies: dependencies)
 
-# executable(
-#  'awale_cli',
-#  common,
-#  'src/awale_cli.c',
-#  dependencies: dependencies,
-# )
+#executable(
+#'awale_cli',
+#common,
+#'src/awale_cli.c',
+#dependencies : dependencies,
+#)
 
 inc = include_directories('src')
 
@@ -100,4 +103,29 @@ foreach case_name : [
   'empty_side_can_be_fed',
 ]
   test('awale/' + case_name, awale_test, args: [case_name])
+endforeach
+
+command_test = executable(
+  'command-test',
+  [
+    'tests/command_test.c',
+    'src/commands/command.c',
+    'src/commands/arg_parser.c',
+    'src/utils.c',
+  ],
+  include_directories: inc,
+)
+
+foreach case_name : [
+  'parse_cmd',
+  'parse_args',
+  'parse_cmd_unknown',
+  'parse_cmd_wrong_argc',
+  'parse_cmd_too_many_tokens',
+  'parse_cmd_empty',
+  'parse_args_non_int',
+  'parse_args_int_out_of_range',
+  'parse_args_empty_str',
+]
+  test('command/' + case_name, command_test, args: [case_name])
 endforeach

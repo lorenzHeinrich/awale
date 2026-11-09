@@ -2,6 +2,11 @@
 
 #define UTILS_H
 
-int parse_int(const char *s, int *port, int min, int max);
+#include <stdbool.h>
+#include <stddef.h>
+
+bool parse_int(const char *s, int *i, int min, int max);
+
+bool parse_str(const char *s, size_t min, size_t max);
 
 #endif // !UTILS_H

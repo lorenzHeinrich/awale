@@ -6,9 +6,13 @@
 #include <readline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
 
-bool game_client(GameClient *game_client, char *server_addr, int port) {
+static bool client_interact(int fd);
+static char* client_prompt(char* prompt);
+
+bool game_client(GameClient* game_client, char* server_addr, int port) {
   in_addr_t addr;
   if (inet_pton(AF_INET, server_addr, &addr) < 1) {
     LOG_ERROR("invalid IPv4 address: %s", server_addr);
@@ -23,15 +27,31 @@ bool game_client(GameClient *game_client, char *server_addr, int port) {
   char buf[64];
   socket_to_str(&sock, buf, sizeof buf);
   LOG_DEBUG("Connected client to %s", buf);
+  client_interact(sock.fd);
   return true;
 }
 
 static bool client_interact(int fd) {
   while (true) {
+    char* inp = client_prompt("> ");
+    size_t len = strlen(inp);
+    char msg[len + 2];
+    memcpy(msg, inp, len);
+    msg[len] = '\n';
+    msg[len + 1] = '\0';
+    socket_send(fd, msg, len + 1);
+    free(inp);
   }
 }
 
-int main(int argc, char **argv) {
+static char* client_prompt(char* prompt) {
+  char* input;
+  while ((input = readline(prompt)) == NULL)
+    ;
+  return input;
+}
+
+int main(int argc, char** argv) {
   if (argc != 3) {
     printf("Usage: awale_client server_addr port\n");
     exit(0);
@@ -43,7 +63,7 @@ int main(int argc, char **argv) {
     exit(0);
   }
 
-  GameClient client;
+  GameClient client = {0};
 
   if (!game_client(&client, argv[1], port)) {
     printf("Cannot establish connection, exiting\n");
