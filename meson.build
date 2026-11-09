@@ -29,6 +29,8 @@ server = files(
   'src/commands/arg_parser.c',
   'src/commands/command.c',
   'src/commands/leave_command.c',
+  'src/commands/help_command.c',
+  'src/commands/list_command.c',
   'src/commands/move_command.c',
   'src/commands/preconditions.c',
   'src/commands/register_command.c',

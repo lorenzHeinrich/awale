@@ -12,7 +12,7 @@
 typedef enum { ARG_VOID, ARG_INT, ARG_STR } ArgKind;
 
 typedef struct ArgVoid {
-  void *no_value;
+  void* no_value;
 } ArgVoid;
 
 typedef struct ArgInt {
@@ -20,7 +20,7 @@ typedef struct ArgInt {
 } ArgInt;
 
 typedef struct ArgStr {
-  char *str_value;
+  char* str_value;
 } ArgStr;
 
 typedef struct CmdArg {
@@ -39,29 +39,34 @@ typedef struct CmdArgs {
 
 struct GameServer;
 
-typedef char *(*CmdFn)(const CmdArgs args, GameServer *server,
+typedef char* (*CmdFn)(const CmdArgs args, GameServer* server,
                        size_t client_slot);
 
-char *exec_cmd(char *args, GameServer *server, size_t client_slot);
+char* exec_cmd(char* args, GameServer* server, size_t client_slot);
 
 typedef struct {
-  char *name;
+  char* name;
   CmdFn fn;
-  const ArgKind *arg_types;
+  const ArgKind* arg_types;
   size_t n_args;
 } Command;
 
-extern char *awale_on_move(const CmdArgs args, GameServer *server,
+extern char* awale_on_move(const CmdArgs args, GameServer* server,
                            size_t client_slot);
 extern const ArgKind on_move_args[];
 extern const size_t on_move_n_args;
 
-char *awale_on_leave(const CmdArgs args, GameServer *server,
+char* awale_on_leave(const CmdArgs args, GameServer* server,
                      size_t client_slot);
 extern const ArgKind on_leave_args[];
 extern const size_t on_leave_n_args;
 
-char *on_register(const CmdArgs args, GameServer *server, size_t client_slot);
+char* awale_on_players(const CmdArgs args, GameServer* server,
+                       size_t client_slot);
+
+char* awale_on_help(const CmdArgs args, GameServer* server, size_t client_slot);
+
+char* on_register(const CmdArgs args, GameServer* server, size_t client_slot);
 extern const ArgKind on_register_args[];
 extern const size_t on_register_n_args;
 

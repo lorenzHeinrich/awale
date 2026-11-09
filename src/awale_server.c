@@ -12,11 +12,11 @@
 #include <unistd.h>
 
 typedef struct {
-  GameServer *server;
+  GameServer* server;
   size_t slot;
 } GameLoopArgs;
 
-int next_free_client_slot(GameServer *game_server) {
+int next_free_client_slot(GameServer* game_server) {
   pthread_mutex_lock(&game_server->clients_lock);
   int slot = -1;
   for (size_t i = 0; i < MAX_CLIENTS; i++) {
@@ -33,13 +33,13 @@ int next_free_client_slot(GameServer *game_server) {
   return slot;
 }
 
-void disconnect_client(GameServer *game_server, size_t slot) {
+void disconnect_client(GameServer* game_server, size_t slot) {
   pthread_mutex_lock(&game_server->clients_lock);
   game_server->clients[slot].socket.fd = -1;
   pthread_mutex_unlock(&game_server->clients_lock);
 }
 
-bool game_server(GameServer *game_server, int port) {
+bool game_server(GameServer* game_server, int port) {
   Socket sock;
   if (!server_socket(htonl(INADDR_ANY), port, &sock)) {
     return false;
@@ -57,33 +57,33 @@ bool game_server(GameServer *game_server, int port) {
   return true;
 }
 
-static void server_interact(int fd, GameServer *server, size_t client_slot) {
+static void server_interact(int fd, GameServer* server, size_t client_slot) {
   while (true) {
     char buf[MAX_INPUT_LEN];
     if (!socket_read_str(fd, buf, MAX_INPUT_LEN)) {
       LOG_DEBUG("failed to read from socket... disconnecting");
       return;
     }
-    char *result = exec_cmd(buf, server, client_slot);
+    char* result = exec_cmd(buf, server, client_slot);
     char send_buf[MAX_SEND_LENGTH + 1];
     size_t res_len = strlen(result);
     if (res_len >= MAX_SEND_LENGTH) {
       LOG_ERROR("Response lenth %zu longer then max send", res_len);
-      char *msg = "Internal server error\n";
-      socket_send(fd, msg, strlen(msg));
+      char* msg = "Internal server error";
+      socket_send(fd, msg, strlen(msg) + 1); /* +1: include '\0' terminator */
       continue;
     }
     memcpy(send_buf, result, res_len);
-    send_buf[res_len] = '\n';
+    send_buf[res_len] = '\0'; /* message terminator */
     send_buf[res_len + 1] = '\0';
     if (!socket_send(fd, send_buf, res_len + 1)) {
       LOG_ERROR("Could not send response %s", send_buf);
     }
   }
 }
-static void *game_loop(void *args) {
-  GameLoopArgs *ga = args;
-  GameServer *server = ga->server;
+static void* game_loop(void* args) {
+  GameLoopArgs* ga = args;
+  GameServer* server = ga->server;
   size_t slot = ga->slot;
   char buf[64];
   socket_to_str(&server->socket, buf, 64);
@@ -96,7 +96,7 @@ static void *game_loop(void *args) {
   return NULL;
 }
 
-void start(GameServer *game_server) {
+void start(GameServer* game_server) {
   game_server->running = true;
   LOG_INFO("Started Awale game server!");
   while (game_server->running) {
@@ -116,7 +116,7 @@ void start(GameServer *game_server) {
     }
     game_server->clients[slot] = (GameClient){.name = {0}, .socket = client};
 
-    GameLoopArgs *args = malloc(sizeof *args);
+    GameLoopArgs* args = malloc(sizeof *args);
     args->server = game_server;
     args->slot = (size_t)slot;
     pthread_t tid;

@@ -12,9 +12,9 @@
 #define MAX_RESPONSE_LEN 1024
 
 static bool client_interact(int fd);
-static char *client_prompt(char *prompt);
+static char* client_prompt(char* prompt);
 
-bool game_client(GameClient *game_client, char *server_addr, int port) {
+bool game_client(GameClient* game_client, char* server_addr, int port) {
   in_addr_t addr;
   if (inet_pton(AF_INET, server_addr, &addr) < 1) {
     LOG_ERROR("invalid IPv4 address: %s", server_addr);
@@ -35,16 +35,15 @@ bool game_client(GameClient *game_client, char *server_addr, int port) {
 
 static bool client_interact(int fd) {
   while (true) {
-    char *inp = client_prompt("> ");
+    char* inp = client_prompt("> ");
     if (inp == NULL) {
       printf("\n");
       return true; /* EOF (Ctrl-D): quit instead of busy-looping */
     }
     size_t len = strlen(inp);
-    char msg[len + 2];
+    char msg[len + 1];
     memcpy(msg, inp, len);
-    msg[len] = '\n';
-    msg[len + 1] = '\0';
+    msg[len] = '\0'; /* message terminator */
     socket_send(fd, msg, len + 1);
     free(inp);
 
@@ -57,11 +56,11 @@ static bool client_interact(int fd) {
   }
 }
 
-static char *client_prompt(char *prompt) {
+static char* client_prompt(char* prompt) {
   return readline(prompt); /* NULL on EOF */
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   if (argc != 3) {
     printf("Usage: awale_client server_addr port\n");
     exit(0);

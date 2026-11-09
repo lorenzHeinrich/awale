@@ -36,13 +36,25 @@ const Command commands[] = {
         .arg_types = on_leave_args,
         .n_args = on_leave_n_args,
     },
+    (Command){
+        .name = "players",
+        .fn = awale_on_players,
+        .arg_types = NULL,
+        .n_args = 0,
+    },
+    (Command){
+        .name = "help",
+        .fn = awale_on_help,
+        .arg_types = NULL,
+        .n_args = 0,
+    },
 };
 
 const size_t n_commands = sizeof commands / sizeof commands[0];
 
-char *exec_cmd(char *args, GameServer *server, size_t client_slot) {
+char* exec_cmd(char* args, GameServer* server, size_t client_slot) {
   char token_bufs[MAX_ARGS][MAX_ARG_LEN];
-  char *tokens[MAX_ARGS];
+  char* tokens[MAX_ARGS];
   for (size_t i = 0; i < MAX_ARGS; i++) {
     tokens[i] = token_bufs[i];
   }
