@@ -1,6 +1,7 @@
 #ifndef CLIENTS_H
 #define CLIENTS_H
 
+#include "src/awale/awale.h"
 #include "src/socket.h"
 #include <pthread.h>
 #include <stdbool.h>
@@ -8,14 +9,23 @@
 
 #define MAX_CLIENTS 128
 #define PLAYER_NAME_MAX_LENGTH 31
+#define MAX_HISTORY 16
 
 struct Match;
+
+/* Snapshot of a finished match, kept per player. */
+typedef struct MatchRecord {
+  Game game; /* final state incl. winner */
+  char opponent[PLAYER_NAME_MAX_LENGTH];
+} MatchRecord;
 
 typedef struct GameClient {
   char name[PLAYER_NAME_MAX_LENGTH];
   Socket socket;
   struct Match *current_match; /* NULL = no match */
   bool quit;
+  MatchRecord history[MAX_HISTORY];
+  size_t n_history;
 } GameClient;
 
 typedef struct ClientRegistry {

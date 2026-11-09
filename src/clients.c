@@ -72,6 +72,7 @@ void clients_clear_match(ClientRegistry *registry, size_t slot) {
   if (m != NULL) {
     LOG_INFO("ending match of slot %zu (slots %zu/%zu)", slot, m->slot_a,
              m->slot_b);
+    match_record(registry, m);
     match_destroy(m);
   }
 }

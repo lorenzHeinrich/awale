@@ -2,6 +2,7 @@
 #define MATCH_H
 
 #include "src/awale/awale.h"
+#include "src/clients.h"
 #include <pthread.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -20,5 +21,9 @@ void match_destroy(Match *match);
 
 typedef void (*MatchFn)(Match *match, void *ctx);
 void with_match(Match *match, MatchFn fn, void *ctx);
+
+/* Appends the match's final state to both players' history (registry lock
+   held internally). */
+void match_record(ClientRegistry *registry, Match *match);
 
 #endif // !MATCH_H

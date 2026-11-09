@@ -50,9 +50,9 @@ char *awale_on_match(const CmdArgs args, ClientRegistry *registry,
   MatchCtx ctx = {.resp = resp, .resp_len = sizeof resp, .rendered = 0};
   with_match(match, render_match, &ctx);
   if (!ctx.started) {
-    size_t other = ctx.slot_a == client_slot ? ctx.slot_b : ctx.slot_a;
+    /* The inviter is always slot_a (set in do_invite). */
     char inviter[PLAYER_NAME_MAX_LENGTH] = {0};
-    clients_with_slot(registry, other, copy_name, inviter);
+    clients_with_slot(registry, ctx.slot_a, copy_name, inviter);
     snprintf(resp, sizeof resp, "invite from %s pending\n", inviter);
     return resp;
   }

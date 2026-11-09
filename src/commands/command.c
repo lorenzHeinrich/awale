@@ -24,6 +24,10 @@ const size_t on_invite_n_args = 1;
 const ArgKind on_accept_args[] = {ARG_STR};
 const size_t on_accept_n_args = 1;
 
+// history entry id
+const ArgKind on_replay_args[] = {ARG_INT};
+const size_t on_replay_n_args = 1;
+
 const Command commands[] = {
     (Command){
         .name = "register",
@@ -76,6 +80,24 @@ const Command commands[] = {
     (Command){
         .name = "match",
         .fn = awale_on_match,
+        .arg_types = NULL,
+        .n_args = 0,
+    },
+    (Command){
+        .name = "history",
+        .fn = awale_on_history,
+        .arg_types = NULL,
+        .n_args = 0,
+    },
+    (Command){
+        .name = "replay",
+        .fn = awale_on_replay,
+        .arg_types = on_replay_args,
+        .n_args = on_replay_n_args,
+    },
+    (Command){
+        .name = "surrender",
+        .fn = awale_on_surrender,
         .arg_types = NULL,
         .n_args = 0,
     },

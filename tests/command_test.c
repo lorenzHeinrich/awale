@@ -42,6 +42,18 @@ char *awale_on_match(const CmdArgs args, ClientRegistry *registry,
                      size_t client_slot) {
   return "";
 }
+char *awale_on_history(const CmdArgs args, ClientRegistry *registry,
+                       size_t client_slot) {
+  return "";
+}
+char *awale_on_replay(const CmdArgs args, ClientRegistry *registry,
+                      size_t client_slot) {
+  return "";
+}
+char *awale_on_surrender(const CmdArgs args, ClientRegistry *registry,
+                         size_t client_slot) {
+  return "";
+}
 
 static void test_parse_cmd_move(void) {
   Command cmd;

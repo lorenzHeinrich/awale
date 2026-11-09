@@ -47,9 +47,9 @@ char *awale_on_invites(const CmdArgs args, ClientRegistry *registry,
     return "no invites";
   }
 
-  size_t other = info.slot_a == client_slot ? info.slot_b : info.slot_a;
+  /* The inviter is always slot_a (set in do_invite), regardless of who asks. */
   char inviter[PLAYER_NAME_MAX_LENGTH] = {0};
-  clients_with_slot(registry, other, copy_name, inviter);
+  clients_with_slot(registry, info.slot_a, copy_name, inviter);
   snprintf(resp, sizeof resp, "invite from %s\n", inviter);
   LOG_DEBUG("slot %zu: listing invite from %s", client_slot, inviter);
   return resp;

@@ -51,9 +51,9 @@ char *awale_on_accept(const CmdArgs args, ClientRegistry *registry,
     return "match already started";
   }
 
-  size_t inviter_slot = info.slot_a == client_slot ? info.slot_b : info.slot_a;
+  /* The inviter is always slot_a (set in do_invite). */
   char inviter[PLAYER_NAME_MAX_LENGTH] = {0};
-  clients_with_slot(registry, inviter_slot, copy_name, inviter);
+  clients_with_slot(registry, info.slot_a, copy_name, inviter);
   if (strcmp(inviter, from) != 0) {
     return "no invite from that player";
   }
